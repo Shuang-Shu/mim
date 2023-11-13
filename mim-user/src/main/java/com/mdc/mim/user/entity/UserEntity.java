@@ -19,7 +19,7 @@ public class UserEntity {
     private Long uid;
     private String passwdMd5;
     private String userName;
-    private String nickname;
+    private String nickName;
     private Date registerDate;
     // 非持久化属性
     private String devId;

@@ -14,7 +14,7 @@ public class ClientApp {
         var context = SpringApplication.run(ClientApp.class, args);
         var nettyClient = context.getBean(NettyClient.class);
         var user = UserEntity.builder().uid(12345L).devId("wsl-linux-dajfo").token("testToken")
-                .nickname("ShuangShu").build();
+                .nickName("ShuangShu").build();
         nettyClient.setUser(user);
         nettyClient.doConnect();
         System.out.println(nettyClient);

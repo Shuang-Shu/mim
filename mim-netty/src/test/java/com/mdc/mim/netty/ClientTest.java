@@ -39,7 +39,7 @@ public class ClientTest {
     @BeforeEach
     public void initUesr() throws InterruptedException {
         user = UserEntity.builder().uid(12345L).devId("wsl-linux-dajfo").token("testToken")
-                .nickname("ShuangShu").build();
+                .nickName("ShuangShu").build();
         nettyClient.setUser(user);
         nettyClient.doConnect().sync();
         Thread.sleep(500);

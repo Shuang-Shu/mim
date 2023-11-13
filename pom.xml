@@ -29,6 +29,7 @@
         <module>mim-user</module>
         <module>mim-common</module>
         <module>mim-netty</module>
+        <module>mim-cluster</module>
     </modules>
 
     <dependencies>

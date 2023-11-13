@@ -1,0 +1,79 @@
+package com.mdc.mim.user;
+
+import java.lang.ProcessHandle.Info;
+
+//个别引入的包
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+//这里配置文件没找到，估计是test的自启动里面就引入了的，查看了下版本org.springframework:spring-test:5.2.4.RELEASE
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+//网上都是没有classes，但是我会报错。必须引入classes,且classes值不能乱写，要是你的springboot工程的启动类，要不没有后面MockMvc会报获取,不到请求URL的错误，即使你后台单独启动了springboot的项目。
+
+@SpringBootTest(classes = { TestApp.class }) // 启动整个springboot工程
+
+// 这个看名字就知道是自动MockMvc的了。开启后还要添加@Autowired自动注入
+@AutoConfigureMockMvc
+class UserControllerTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+
+    // 网上有这种形式创建MockMvc的，结果我怎么都不行，这里也写出来
+    // 编辑一下，用这种方法的是用junit4的。
+    // @Autowired
+    // private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    private MockMvc mvc;
+
+    private MockHttpSession session;
+
+    // junit5要用@BeforeEach，不是@Before
+    @BeforeEach
+    public void setupMockMvc() {
+
+        // mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        // mvc = MockMvcBuilders.standaloneSetup(new WebController()).build();
+        session = new MockHttpSession();
+
+    }
+
+    @Test
+    void login() throws Exception {
+        Info info = new Info();
+        info.setUserName("admin");
+        info.setPassword("admin");
+        // 请求路径不要错了
+        MvcResult mvcResult = (MvcResult) mvc.perform(MockMvcRequestBuilders.post("/user/login")
+                .accept(MediaType.ALL)
+                .session(session)
+                // 这里要特别注意和content传参数的不同，具体看你接口接受的是哪种
+                .param("userName", info.getUserName()).param("password", info.getPassword())
+        // 传json参数,最后传的形式是 Body = {"password":"admin","userName":"admin"}
+        // .content(JSON.toJSON(info).toString().getBytes())
+        )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andDo(MockMvcResultHandlers.print())
+                .andReturn();
+
+        // 得到返回代码
+        int status = mvcResult.getResponse().getStatus();
+        // 得到返回结果
+        String content = mvcResult.getResponse().getContentAsString();
+
+        LOGGER.info(content);
+
+    }
+
+}

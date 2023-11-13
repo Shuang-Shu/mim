@@ -21,7 +21,7 @@ public class ChatMessageSender extends AbstractSender {
         var user = getUser();
         var chatMessageRequest = Message.MessageRequest.builder().id(getId()).from(user.getUid()).to(toUid)
                 .time(System.currentTimeMillis()).messageType(Message.ChatMessageType.TEXT).content(content)
-                .property(null).fromNick(user.getNickname()).json(null).build();
+                .property(null).fromNick(user.getNickName()).json(null).build();
         var msg = Message.builder().sessionId(getClientSession().getSessionId())
                 .messageType(MessageTypeEnum.MESSAGE_REQ).messageRequest(chatMessageRequest).build();
         log.debug("sending chat message: {}", msg);
