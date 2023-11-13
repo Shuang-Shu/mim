@@ -1,4 +1,24 @@
+spring:
+  application:
+    name: mim-netty
+
+# 日志设置
+logging:
+  level:
+    com.mdc.mim: info
+
+# mim server配置
 mim:
   server:
     host: localhost
     port: 8080
+
+# nacos配置
+nacos:
+  discovery:
+    server-addr: 127.0.0.1:8848
+    username: nacos
+    password: nacos
+    auto-register: true
+    register:
+      groupName: MIM

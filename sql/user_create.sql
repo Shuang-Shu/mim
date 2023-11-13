@@ -3,6 +3,7 @@ CREATE TABLE user (
     passwdMd5 CHAR(32) NOT NULL,
     userName VARCHAR(40) NOT NULL,
     nickName VARCHAR(40) NOT NULL,
-    registerDate DATE NOT NULL
+    registerDate DATE NOT NULL,
+    INDEX(userName)
 ) ENGINE = InnoDB,
 Charset = utf8;
