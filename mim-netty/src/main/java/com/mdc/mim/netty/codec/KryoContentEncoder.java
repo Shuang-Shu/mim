@@ -9,8 +9,10 @@ import com.esotericsoftware.kryo.io.Output;
 import com.mdc.mim.common.constant.CommonConstant;
 import com.mdc.mim.common.utils.ClassIdUtils;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
+import org.springframework.stereotype.Component;
 
 /*
  * Use Kryo to convert byte array to object
@@ -18,6 +20,10 @@ import io.netty.handler.codec.MessageToMessageEncoder;
 public class KryoContentEncoder extends MessageToMessageEncoder<Object> {
 
     final ThreadLocal<Kryo> serializerThreadLocal;
+
+    public KryoContentEncoder() {
+        serializerThreadLocal = ThreadLocal.withInitial(() -> CommonConstant.supplier.get());
+    }
 
     public KryoContentEncoder(Supplier<Kryo> supplier) {
         serializerThreadLocal = ThreadLocal.withInitial(() -> supplier.get());

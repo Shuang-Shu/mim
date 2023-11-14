@@ -9,9 +9,11 @@ import com.mdc.mim.netty.session.ClientSession;
 
 import io.netty.channel.ChannelHandler.Sharable;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Sharable
+@Component
 public class LoginResponesHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

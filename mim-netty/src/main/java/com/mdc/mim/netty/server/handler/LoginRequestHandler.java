@@ -6,13 +6,17 @@ import com.mdc.mim.common.constant.MessageTypeEnum;
 import com.mdc.mim.common.constant.ResponsesCodeEnum;
 import com.mdc.mim.common.dto.Message;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
+@ChannelHandler.Sharable
 public class LoginRequestHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -29,15 +33,15 @@ public class LoginRequestHandler extends ChannelInboundHandlerAdapter {
 
     /**
      * 认证，将sessionId返回给client
-     * 
+     *
      * @return
      */
     private boolean doIdentify(ChannelHandlerContext ctx, Object msg) {
         var loginReq = (Message) msg;
         var loginResp = Message.builder().messageType(MessageTypeEnum.LOGIN_RESP).loginResponse(
-                Message.LoginResponse.builder().id(loginReq.getLoginRequest().getId()).sessionId(getSessionId())
-                        .code(ResponsesCodeEnum.SUCCESS.getCode())
-                        .info("successfully identified").expose(0).build())
+                        Message.LoginResponse.builder().id(loginReq.getLoginRequest().getId()).sessionId(getSessionId())
+                                .code(ResponsesCodeEnum.SUCCESS.getCode())
+                                .info("successfully identified").expose(0).build())
                 .build();
         var f = ctx.channel().writeAndFlush((Object) loginResp);
         f.addListener(

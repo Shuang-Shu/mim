@@ -6,8 +6,10 @@ import com.esotericsoftware.kryo.Kryo;
 import com.mdc.mim.common.constant.CommonConstant;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.springframework.stereotype.Component;
 
 /*
  * 将字节流转换为byte[]对象

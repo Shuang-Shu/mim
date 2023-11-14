@@ -3,11 +3,15 @@ package com.mdc.mim.netty.server.handler;
 import com.mdc.mim.common.constant.MessageTypeEnum;
 import com.mdc.mim.common.dto.Message;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
+@ChannelHandler.Sharable
 public class ChatMessageRequestHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

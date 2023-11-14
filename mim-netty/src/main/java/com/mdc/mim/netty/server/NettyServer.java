@@ -8,8 +8,7 @@ import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
 import com.mdc.mim.netty.codec.MIMByteEncoder;
 import com.mdc.mim.common.constant.CommonConstant;
-import com.mdc.mim.netty.server.handler.ChatMessageRequestHandler;
-import com.mdc.mim.netty.server.handler.LoginRequestHandler;
+import com.mdc.mim.netty.server.handler.*;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -19,18 +18,32 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 @Slf4j
-public class NettyServer implements Closeable {
+public class NettyServer {
 
     public NettyServer(String host, int port) {
         this.host = host;
         this.port = port;
     }
 
+    @Value("${mim.server.host}")
     private String host;
+    @Value("${mim.server.port}")
     private int port;
-
+    // handlers
+    @Autowired
+    private ChatMessageRequestHandler chatMessageRequestHandler;
+    @Autowired
+    private ChatMessageRedirectHandler chatMessageRedirectHandler;
+    @Autowired
+    private LoginRequestHandler loginRequestHandler;
+    @Autowired
+    private LogoutRequestHandler logoutRequestHandler;
+    @Autowired
+    private ServerExceptionHandler serverExceptionHandler;
     private ServerBootstrap b = new ServerBootstrap();
 
     public void start() {
@@ -52,8 +65,8 @@ public class NettyServer implements Closeable {
                     ch.pipeline().addLast(new MIMByteEncoder());
                     ch.pipeline().addLast(new KryoContentEncoder(CommonConstant.supplier));
                     // handlers
-                    ch.pipeline().addLast(new LoginRequestHandler());
-                    ch.pipeline().addLast(new ChatMessageRequestHandler());
+                    ch.pipeline().addLast(loginRequestHandler);
+                    ch.pipeline().addLast(chatMessageRedirectHandler);
                 }
             });
             var channelFuture = b.bind(this.host, this.port).sync();
@@ -64,9 +77,5 @@ public class NettyServer implements Closeable {
             bossLoopGroup.shutdownGracefully();
             workerLoopGroup.shutdownGracefully();
         }
-    }
-
-    @Override
-    public void close() throws IOException {
     }
 }

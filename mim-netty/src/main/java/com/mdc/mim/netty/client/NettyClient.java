@@ -3,6 +3,8 @@ package com.mdc.mim.netty.client;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import com.mdc.mim.netty.client.handler.ChatMessageResponseHandler;
+import com.mdc.mim.netty.client.handler.ClientHeartbeatHandler;
 import com.mdc.mim.netty.client.handler.ExceptionHandler;
 import com.mdc.mim.netty.client.handler.LoginResponesHandler;
 import com.mdc.mim.netty.client.sender.ChatMessageSender;
@@ -42,14 +44,23 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Service("nettyClient")
 public class NettyClient {
-    @Value("${mim.server.host}")
+    @Value("${mim.client.server.host}")
     private String host;
-    @Value("${mim.server.port}")
+    @Value("${mim.client.server.port}")
     private int port;
 
+    // handlers of netty
+    @Autowired
+    private LoginResponesHandler loginResponesHandler;
+    @Autowired
+    private ExceptionHandler exceptionHandler;
+    @Autowired
+    private ChatMessageResponseHandler chatMessageResponseHandler;
+    @Autowired
+    private ClientHeartbeatHandler clientHeartbeatHandler;
+    // senders of netty
     @Autowired
     private LoginSender loginSender;
-
     @Autowired
     private ChatMessageSender chatMessageSender;
 
@@ -120,9 +131,9 @@ public class NettyClient {
                             ch.pipeline().addLast("mimEncoder", new MIMByteEncoder());
                             ch.pipeline().addLast("kryoEncoder", new KryoContentEncoder(CommonConstant.supplier));
                             // 业务处理
-                            ch.pipeline().addLast("loginReqHandler", new LoginResponesHandler());
+                            ch.pipeline().addLast("loginReqHandler", loginResponesHandler);
                             // 异常处理
-                            ch.pipeline().addLast("exceptionHandler", new ExceptionHandler());
+                            ch.pipeline().addLast("exceptionHandler", exceptionHandler);
                         }
                     });
 
@@ -148,7 +159,7 @@ public class NettyClient {
 
     /**
      * 发送消息到uid
-     * 
+     *
      * @param toUid
      * @param content
      */
