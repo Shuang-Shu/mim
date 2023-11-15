@@ -1,5 +1,6 @@
 package com.mdc.mim.netty;
 
+import com.mdc.mim.common.dto.UserDTO;
 import org.junit.jupiter.api.Test;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -22,6 +23,10 @@ import io.netty.channel.embedded.EmbeddedChannel;
 public class HandlerTest {
     static ChannelHandler[] channelHandlers;
 
+    static UserDTO userDTO = UserDTO.builder().userName("test").passwdMd5("test").devId("dev-1").platform(Platform.LINUX).build();
+
+    static Message.LoginRequest loginReq = Message.LoginRequest.buildWith(userDTO, 1L);
+
     static Kryo kryo = CommonConstant.supplier.get();
 
     static {
@@ -30,7 +35,7 @@ public class HandlerTest {
         var kryoSupplier = CommonConstant.supplier;
         var kryoContentEncoder = new KryoContentEncoder(kryoSupplier);
         var kryoContentDecoder = new KryoContentDecoder(kryoSupplier);
-        channelHandlers = new ChannelHandler[] {
+        channelHandlers = new ChannelHandler[]{
                 byteDecoder, kryoContentDecoder, byteEncoder, kryoContentEncoder
         };
     }
@@ -47,8 +52,6 @@ public class HandlerTest {
                         ch.pipeline().addLast(new LoginRequestHandler());
                     }
                 });
-        var loginReq = Message.LoginRequest.builder().id(1).uid(12345L).deviceId("dev-1").token("test-token")
-                .platform(Platform.LINUX).appVersion(CommonConstant.APP_VERSION).build();
         var message = Message.builder().loginRequest(loginReq).messageType(MessageTypeEnum.LOGIN_REQ).build();
         channel.writeOutbound(message);
         var buf = ((ByteBuf) channel.readOutbound()).slice();

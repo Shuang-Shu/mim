@@ -13,6 +13,7 @@ import com.mdc.mim.common.dto.Message.LogoutResponse;
 import com.mdc.mim.common.dto.Message.MessageNotification;
 import com.mdc.mim.common.dto.Message.MessageRequest;
 import com.mdc.mim.common.dto.Message.MessageResponse;
+import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.common.utils.ClassIdUtils;
 
 public class CommonConstant {
@@ -22,7 +23,7 @@ public class CommonConstant {
     public static final int CONTENT_LENGTH = 4;
 
     private static final Class<?>[] messageClasses = {
-            Message.class, Message.ChatMessageType.class, MessageTypeEnum.class,
+            Message.class, Message.ChatMessageType.class, MessageTypeEnum.class, ResponsesCodeEnum.class, UserDTO.class,
             LoginRequest.class, LoginResponse.class, LogoutRequest.class,
             LogoutResponse.class,
             KeepAliveRequest.class, KeepAliveResponse.class,

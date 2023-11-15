@@ -1,6 +1,7 @@
 package com.mdc.mim.netty.session;
 
 import com.mdc.mim.common.dto.Message;
+import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.user.entity.UserEntity;
 
 import io.netty.channel.Channel;
@@ -23,13 +24,13 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ClientSession {
     public static final AttributeKey<ClientSession> SESSION_KEY = AttributeKey.valueOf("SESSION_KEY");
-    private UserEntity user;
+    private UserDTO user;
     private String sessionId;
     private boolean hasLogined;
     private Channel channel;
     private boolean connected = false;
 
-    public ClientSession(Channel channel, UserEntity user) {
+    public ClientSession(Channel channel, UserDTO user) {
         this.channel = channel;
         this.user = user;
         this.connected = true;
@@ -58,7 +59,7 @@ public class ClientSession {
     public void close() {
         connected = false;
 
-        var cf = channel.closeFuture();
+        var cf = channel.close();
         cf.addListener(new ChannelFutureListener() {
 
             @Override

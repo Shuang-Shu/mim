@@ -3,6 +3,7 @@ package com.mdc.mim.netty.client;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.netty.client.handler.ChatMessageResponseHandler;
 import com.mdc.mim.netty.client.handler.ClientHeartbeatHandler;
 import com.mdc.mim.netty.client.handler.ExceptionHandler;
@@ -13,6 +14,7 @@ import com.mdc.mim.netty.codec.KryoContentDecoder;
 import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
 import com.mdc.mim.netty.session.ClientSession;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,11 +46,11 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Service("nettyClient")
 public class NettyClient {
+    // 远程服务器相关
     @Value("${mim.client.server.host}")
     private String host;
     @Value("${mim.client.server.port}")
     private int port;
-
     // handlers of netty
     @Autowired
     private LoginResponesHandler loginResponesHandler;
@@ -64,19 +66,17 @@ public class NettyClient {
     @Autowired
     private ChatMessageSender chatMessageSender;
 
-    private UserEntity user;
+    private UserDTO user;
 
     // netty相关
     private Bootstrap b;
     private EventLoopGroup g = new NioEventLoopGroup();
     // 连接通道相关
-    private Channel channel;
     private ClientSession clientSession;
 
     // listener定义
     GenericFutureListener<ChannelFuture> closeListener = (ChannelFuture f) -> {
         log.info(new Date() + ": connection cloesd...s");
-        channel = f.channel();
         // 关闭会话
         clientSession.close();
     };
@@ -91,8 +91,7 @@ public class NettyClient {
                     TimeUnit.SECONDS);
         } else {
             log.info("Successfully connected IM server!");
-            channel = f.channel();
-
+            var channel = f.channel();
             // 创建会话
             clientSession = new ClientSession(channel, user);
             clientSession.setConnected(true);

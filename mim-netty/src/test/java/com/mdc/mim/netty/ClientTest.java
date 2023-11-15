@@ -1,9 +1,14 @@
 package com.mdc.mim.netty;
 
+import com.mdc.mim.common.concurrent.CallbackExecutor;
+import com.mdc.mim.common.dto.UserDTO;
+import com.mdc.mim.common.utils.DigestUtils;
+import org.aspectj.weaver.ast.CallExpr;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -15,38 +20,28 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest
-public class ClientTest {
+public class ClientTest implements InitializingBean {
 
-    static NettyServer nettyServer;
-    static String host = "0.0.0.0";
-    static int port = 8080;
+    @Autowired
+    NettyServer nettyServer;
 
     @Autowired
     NettyClient nettyClient;
 
-    UserEntity user;
-
-    @BeforeAll
-    public static void initServer() throws InterruptedException {
-        nettyServer = new NettyServer(host, port);
+    @Override
+    public void afterPropertiesSet() throws Exception {
         var t1 = new Thread(() -> {
             nettyServer.start();
         });
         t1.start();
-        log.info("server started");
-    }
-
-    @BeforeEach
-    public void initUesr() throws InterruptedException {
-        user = UserEntity.builder().uid(12345L).devId("wsl-linux-dajfo").token("testToken")
-                .nickName("ShuangShu").build();
+        Thread.sleep(500);
+        var user = UserDTO.builder().userName("shuangshu").passwdMd5(DigestUtils.md5("12345")).build();
         nettyClient.setUser(user);
         nettyClient.doConnect().sync();
-        Thread.sleep(500);
     }
 
     @Test
-    public void basicTest() {
+    public void testBasic() {
         Assertions.assertNotNull(nettyClient);
         Assertions.assertNotNull(nettyClient.getUser());
     }
@@ -61,19 +56,29 @@ public class ClientTest {
     @Test
     public void testLogin() throws InterruptedException {
         // 测试客户端登录功能
-        nettyClient.doLogin();
-        Thread.sleep(500);
+        var loginFuture = nettyClient.doLogin().sync();
+        Assertions.assertEquals(true, loginFuture.isSuccess());
+        if (!loginFuture.isSuccess()) {
+            log.error("login failed: {}", loginFuture.cause().getMessage());
+        }
+        Thread.sleep(1000);
+//        while (CallbackExecutor.instance().activeCount() > 0) {
+//            try {
+//                Thread.sleep(500);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     /**
      * 测试消息发送功能
-     * 
+     *
      * @throws InterruptedException
      */
     @Test
     public void testSending() throws InterruptedException {
         nettyClient.doLogin().sync();
-        Thread.sleep(500);
         nettyClient.doSend(12345L, "test_content");
     }
 }

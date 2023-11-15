@@ -5,17 +5,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.mdc.mim.user.entity.UserEntity;
+import org.springframework.stereotype.Component;
 
-public class ServerSessionMap {
-    private ServerSessionMap() {
-    }
-
+@Component
+public class ServerSessionManager {
     ConcurrentMap<String, ServerSession> sessionMap = new ConcurrentHashMap<>();
 
-    private static ServerSessionMap instance = new ServerSessionMap();
-
-    public static ServerSessionMap instance() {
-        return instance;
+    public boolean contains(String sessionId) {
+        return sessionMap.containsKey(sessionId);
     }
 
     public ServerSession getSession(String sessionId) {
@@ -36,7 +33,7 @@ public class ServerSessionMap {
 
     /**
      * 获取user对应的所有会话
-     * 
+     *
      * @param user
      * @return
      */

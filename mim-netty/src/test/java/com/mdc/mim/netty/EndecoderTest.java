@@ -2,6 +2,10 @@ package com.mdc.mim.netty;
 
 import java.io.Serializable;
 
+import com.mdc.mim.common.constant.ResponsesCodeEnum;
+import com.mdc.mim.common.dto.Message;
+import com.mdc.mim.common.dto.UserDTO;
+import com.mdc.mim.common.utils.DigestUtils;
 import org.junit.jupiter.api.Test;
 
 import com.mdc.mim.netty.codec.KryoContentDecoder;
@@ -58,6 +62,8 @@ public class EndecoderTest {
         channel = new EmbeddedChannel(initializer);
     }
 
+    static UserDTO userDTO = UserDTO.builder().userName("test").passwdMd5("test").devId("dev-1").platform(Platform.LINUX).build();
+
     static ChannelHandler[] channelHandlers;
 
     static {
@@ -66,14 +72,14 @@ public class EndecoderTest {
         var kryoSupplier = CommonConstant.supplier;
         var kryoContentEncoder = new KryoContentEncoder(kryoSupplier);
         var kryoContentDecoder = new KryoContentDecoder(kryoSupplier);
-        channelHandlers = new ChannelHandler[] {
+        channelHandlers = new ChannelHandler[]{
                 byteDecoder, kryoContentDecoder, byteEncoder, kryoContentEncoder
         };
     }
 
     /**
      * 先将对象写入输出端，再将结果从输入端写入，检查解码结果与原始结果是否一致
-     * 
+     *
      * @param channel
      * @param msg
      */
@@ -97,11 +103,9 @@ public class EndecoderTest {
     @Test
     public void testLoginTransport() {
         initialChannelWith(channelHandlers);
-        var req = LoginRequest.builder().id(123L).uid(12345L).appVersion(CommonConstant.APP_VERSION).deviceId("ios")
-                .platform(Platform.LINUX)
-                .build();
+        var req = LoginRequest.buildWith(userDTO, 1L);
         doTestPipeline(channel, req);
-        var resp = LoginResponse.builder().code(1).id(123L).info("success").expose(9).build();
+        var resp = LoginResponse.builder().code(ResponsesCodeEnum.SUCCESS).id(123L).info("success").expose(9).build();
         doTestPipeline(channel, resp);
     }
 

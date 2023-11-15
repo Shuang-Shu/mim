@@ -20,9 +20,14 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 public class NettyServer {
+
+    public NettyServer() {
+    }
 
     public NettyServer(String host, int port) {
         this.host = host;
@@ -70,7 +75,8 @@ public class NettyServer {
                 }
             });
             var channelFuture = b.bind(this.host, this.port).sync();
-            channelFuture.channel().closeFuture().sync(); // 等待关闭的同步事件
+            log.info("server started");
+            channelFuture.channel().closeFuture().sync(); // 等待关闭的同步事件，保持服务器常开
         } catch (Exception e) {
             log.error("exception: {}", e);
         } finally {

@@ -2,7 +2,7 @@ package com.mdc.mim.netty.client.sender;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.mdc.mim.user.entity.UserEntity;
+import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.netty.session.ClientSession;
 
 import io.netty.channel.ChannelFuture;
@@ -25,12 +25,12 @@ public abstract class AbstractSender {
      * 发送消息
      */
     public ChannelFuture sendMessage(Object msg) {
+        // 目前使用同步的方式发送请求
         if (null == getClientSession() || !getClientSession().isConnected()) {
             log.info("connection is not established yet!");
             return null;
         }
-        var channel = getClientSession().getChannel();
-        var f = channel.writeAndFlush(msg);
+        var f = getClientSession().writeAndFlush(msg);
         f.addListener( // 为发送事件添加回调
                 new GenericFutureListener<Future<? super Void>>() {
                     @Override
@@ -55,7 +55,7 @@ public abstract class AbstractSender {
         log.info("send message failed: {}", msg);
     }
 
-    protected UserEntity getUser() {
+    protected UserDTO getUser() {
         return clientSession.getUser();
     }
 

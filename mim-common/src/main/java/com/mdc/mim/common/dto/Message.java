@@ -1,20 +1,24 @@
 package com.mdc.mim.common.dto;
 
+import com.mdc.mim.common.constant.CommonConstant;
 import com.mdc.mim.common.constant.Platform;
 import com.mdc.mim.common.constant.MessageTypeEnum;
 
+import com.mdc.mim.common.constant.ResponsesCodeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
 @Builder
+@Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Message {
     MessageTypeEnum messageType; // 消息类型
-    String sessionId;
+    String sessionId; // 请求中携带的sessionId
 
     // 登入
     LoginRequest loginRequest;
@@ -37,24 +41,27 @@ public class Message {
 
     @Data
     @Builder
+    @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginRequest {
+        public static LoginRequest buildWith(UserDTO user, long messageId) {
+            return LoginRequest.builder().user(user).id(messageId).appVersion(CommonConstant.APP_VERSION).build();
+        }
+
+        UserDTO user;
         long id;
-        Long uid;
-        String deviceId;
-        String token;
-        Platform platform;
         int appVersion;
     }
 
     @Data
     @Builder
+    @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginResponse {
         long id;
-        int code;
+        ResponsesCodeEnum code;
         String info;
         String sessionId;
         int expose; // 存疑
@@ -62,6 +69,7 @@ public class Message {
 
     @Data
     @Builder
+    @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LogoutRequest {
@@ -70,6 +78,7 @@ public class Message {
 
     @Data
     @Builder
+    @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LogoutResponse {
@@ -78,6 +87,7 @@ public class Message {
 
     @Data
     @Builder
+    @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class KeepAliveRequest {
@@ -86,6 +96,7 @@ public class Message {
 
     @Data
     @Builder
+    @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class KeepAliveResponse {
@@ -94,6 +105,7 @@ public class Message {
 
     @Data
     @Builder
+    @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MessageRequest {
@@ -111,6 +123,7 @@ public class Message {
 
     @Data
     @Builder
+    @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MessageResponse {
@@ -124,6 +137,7 @@ public class Message {
 
     @Data
     @Builder
+    @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MessageNotification {

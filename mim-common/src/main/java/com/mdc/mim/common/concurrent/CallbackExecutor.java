@@ -40,4 +40,8 @@ public class CallbackExecutor {
             }
         }, executorService);
     }
+
+    public int activeCount() {
+        return ((ThreadPoolExecutor) delegate).getActiveCount();
+    }
 }
