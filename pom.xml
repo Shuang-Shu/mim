@@ -35,6 +35,8 @@
         <module>mim-common</module>
         <module>mim-netty</module>
         <module>mim-cluster</module>
+        <module>mim-client</module>
+        <module>mim-manage</module>
     </modules>
 
     <dependencies>
