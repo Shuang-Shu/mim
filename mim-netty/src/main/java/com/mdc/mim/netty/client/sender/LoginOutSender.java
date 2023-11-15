@@ -11,11 +11,18 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service("loginSender")
-public class LoginSender extends AbstractSender {
+public class LoginOutSender extends AbstractSender {
     public ChannelFuture sendLogin(UserDTO user) {
         var loginRequest = Message.LoginRequest.buildWith(user, getId());
         var msg = Message.builder().messageType(MessageTypeEnum.LOGIN_REQ).loginRequest(loginRequest).build();
-        log.debug("sending log request: {}", msg);
+        log.debug("sending login request: {}", msg);
+        return super.sendMessage(msg);
+    }
+
+    public ChannelFuture sendLogout(UserDTO user) {
+        var logoutRequest = Message.LogoutRequest.buildWith(user, getId());
+        var msg = Message.builder().messageType(MessageTypeEnum.LOGOUT_REQ).logoutRequest(logoutRequest).sessionId(clientSession.getSessionId()).build();
+        log.debug("sending logout request: {}", msg);
         return super.sendMessage(msg);
     }
 }

@@ -12,7 +12,7 @@ public class ServerSessionManager {
     ConcurrentMap<String, ServerSession> sessionMap = new ConcurrentHashMap<>();
 
     public boolean contains(String sessionId) {
-        return sessionMap.containsKey(sessionId);
+        return sessionId != null && sessionMap.containsKey(sessionId);
     }
 
     public ServerSession getSession(String sessionId) {

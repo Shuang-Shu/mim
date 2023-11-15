@@ -73,6 +73,11 @@ public class Message {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LogoutRequest {
+        public static LogoutRequest buildWith(UserDTO user, long messageId) {
+            return LogoutRequest.builder().user(user).id(messageId).build();
+        }
+
+        UserDTO user;
         long id;
     }
 
@@ -83,6 +88,8 @@ public class Message {
     @AllArgsConstructor
     public static class LogoutResponse {
         long id;
+        String info;
+        ResponsesCodeEnum code;
     }
 
     @Data

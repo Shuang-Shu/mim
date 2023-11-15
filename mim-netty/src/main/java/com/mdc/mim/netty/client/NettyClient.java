@@ -7,25 +7,22 @@ import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.netty.client.handler.ChatMessageResponseHandler;
 import com.mdc.mim.netty.client.handler.ClientHeartbeatHandler;
 import com.mdc.mim.netty.client.handler.ExceptionHandler;
-import com.mdc.mim.netty.client.handler.LoginResponesHandler;
+import com.mdc.mim.netty.client.handler.LoginOutResponesHandler;
 import com.mdc.mim.netty.client.sender.ChatMessageSender;
-import com.mdc.mim.netty.client.sender.LoginSender;
+import com.mdc.mim.netty.client.sender.LoginOutSender;
 import com.mdc.mim.netty.codec.KryoContentDecoder;
 import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
 import com.mdc.mim.netty.session.ClientSession;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.mdc.mim.netty.codec.MIMByteEncoder;
 import com.mdc.mim.common.constant.CommonConstant;
-import com.mdc.mim.user.entity.UserEntity;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -53,7 +50,7 @@ public class NettyClient {
     private int port;
     // handlers of netty
     @Autowired
-    private LoginResponesHandler loginResponesHandler;
+    private LoginOutResponesHandler loginOutResponesHandler;
     @Autowired
     private ExceptionHandler exceptionHandler;
     @Autowired
@@ -62,7 +59,7 @@ public class NettyClient {
     private ClientHeartbeatHandler clientHeartbeatHandler;
     // senders of netty
     @Autowired
-    private LoginSender loginSender;
+    private LoginOutSender loginoutSender;
     @Autowired
     private ChatMessageSender chatMessageSender;
 
@@ -96,7 +93,7 @@ public class NettyClient {
             clientSession = new ClientSession(channel, user);
             clientSession.setConnected(true);
             // 为sender添加通道
-            this.loginSender.setClientSession(clientSession);
+            this.loginoutSender.setClientSession(clientSession);
             this.chatMessageSender.setClientSession(clientSession);
             // 添加close listener
             channel.closeFuture().addListener(closeListener);
@@ -130,7 +127,7 @@ public class NettyClient {
                             ch.pipeline().addLast("mimEncoder", new MIMByteEncoder());
                             ch.pipeline().addLast("kryoEncoder", new KryoContentEncoder(CommonConstant.supplier));
                             // 业务处理
-                            ch.pipeline().addLast("loginReqHandler", loginResponesHandler);
+                            ch.pipeline().addLast("loginReqHandler", loginOutResponesHandler);
                             // 异常处理
                             ch.pipeline().addLast("exceptionHandler", exceptionHandler);
                         }
@@ -150,10 +147,24 @@ public class NettyClient {
      * 发送登录消息
      */
     public ChannelFuture doLogin() {
+        if (clientSession == null || !clientSession.isHasLogined()) {
+            log.error("has not login yet");
+        }
+        return loginoutSender.sendLogin(user);
+    }
+
+    /**
+     * @description: 退出登录
+     * @param:
+     * @return:
+     * @author ShuangShu
+     * @date: 2023/11/15 18:54
+     */
+    public ChannelFuture doLogout() {
         if (clientSession == null || !clientSession.isConnected()) {
             log.error("connecting {}:{} failed", host, port);
         }
-        return loginSender.sendLogin(user);
+        return loginoutSender.sendLogout(user);
     }
 
     /**

@@ -1,8 +1,5 @@
 package com.mdc.mim.netty.server;
 
-import java.io.Closeable;
-import java.io.IOException;
-
 import com.mdc.mim.netty.codec.KryoContentDecoder;
 import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
@@ -44,7 +41,7 @@ public class NettyServer {
     @Autowired
     private ChatMessageRedirectHandler chatMessageRedirectHandler;
     @Autowired
-    private LoginRequestHandler loginRequestHandler;
+    private LoginOutRequestHandler loginOutRequestHandler;
     @Autowired
     private LogoutRequestHandler logoutRequestHandler;
     @Autowired
@@ -70,7 +67,7 @@ public class NettyServer {
                     ch.pipeline().addLast(new MIMByteEncoder());
                     ch.pipeline().addLast(new KryoContentEncoder(CommonConstant.supplier));
                     // handlers
-                    ch.pipeline().addLast(loginRequestHandler);
+                    ch.pipeline().addLast(loginOutRequestHandler);
                     ch.pipeline().addLast(chatMessageRedirectHandler);
                 }
             });

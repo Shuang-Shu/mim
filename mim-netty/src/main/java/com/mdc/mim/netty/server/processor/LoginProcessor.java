@@ -22,7 +22,6 @@ public class LoginProcessor implements AbstractProcessor {
     @Autowired
     private ServerSessionManager sessionManager;
 
-
     @Override
     public MessageTypeEnum supportType() {
         return MessageTypeEnum.LOGIN_REQ;
@@ -35,33 +34,30 @@ public class LoginProcessor implements AbstractProcessor {
     @Override
     public Boolean process(ServerSession session, Message message) {
         var loginReq = message.getLoginRequest();
-        var sessionId = message.getSessionId();
         var loginResp = Message.LoginResponse.builder().id(loginReq.getId())
                 .info("successfully identified").expose(0).build();
         var respMessage = Message.builder().messageType(MessageTypeEnum.LOGIN_RESP).loginResponse(loginResp).build();
         boolean result = false;
-        ResponsesCodeEnum respCode = null;
         // 1 检查是否已登录
-        if (!(sessionId != null && sessionManager.contains(message.getSessionId()))) {
+        if (!sessionManager.contains(message.getSessionId())) {
             // 未登录
             var user = loginReq.getUser();
             var r = userLoginService.identify(user.getUserName(), user.getPasswdMd5());
             var ok = (Boolean) r.get("valid");
             if (!ok) {
-                respCode = ResponsesCodeEnum.FAILED;
+                loginResp.setCode(ResponsesCodeEnum.FAILED);
+                loginResp.setInfo("identify failed, wrong username or password");
             } else {
-                sessionId = getSessionId();
-                respCode = ResponsesCodeEnum.SUCCESS;
-                sessionManager.addSession(sessionId, session);
+                loginResp.setSessionId(getSessionId());
+                loginResp.setCode(ResponsesCodeEnum.SUCCESS);
+                sessionManager.addSession(loginResp.getSessionId(), session);
                 result = true;
             }
         } else {
             // 已登录
-            respCode = ResponsesCodeEnum.SUCCESS;
+            loginResp.setCode(ResponsesCodeEnum.SUCCESS);
             result = true;
         }
-        respMessage.setSessionId(sessionId);
-        loginResp.setCode(respCode);
         var f = session.writeAndFlush(respMessage);
         f.addListener(
                 new GenericFutureListener<Future<? super Void>>() {
@@ -69,6 +65,7 @@ public class LoginProcessor implements AbstractProcessor {
                     public void operationComplete(Future<? super Void> future) throws Exception {
                         if (future.isSuccess()) {
                             log.info("successfully response client");
+                            log.debug("successfully response client: {}", respMessage);
                         } else {
                             future.cause().printStackTrace();
                         }
