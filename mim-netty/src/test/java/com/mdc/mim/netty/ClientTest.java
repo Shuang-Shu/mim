@@ -2,6 +2,7 @@ package com.mdc.mim.netty;
 
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.common.utils.DigestUtils;
+import com.mdc.mim.netty.feign.UserLoginService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.InitializingBean;

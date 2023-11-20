@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
-public class UserIdentifyController {
+public class UserLoginController {
     @Autowired
     private UserEntityService userEntityService;
 

@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service("loginSender")
-public class LoginOutSender extends AbstractSender {
+public class LogInOutSender extends AbstractSender {
     public ChannelFuture sendLogin(UserDTO user) {
         var loginRequest = Message.LoginRequest.buildWith(user, getId());
         var msg = Message.builder().messageType(MessageTypeEnum.LOGIN_REQ).loginRequest(loginRequest).build();

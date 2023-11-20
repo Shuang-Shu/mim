@@ -4,16 +4,14 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import com.mdc.mim.common.dto.UserDTO;
-import com.mdc.mim.netty.client.handler.ChatMessageResponseHandler;
-import com.mdc.mim.netty.client.handler.ClientHeartbeatHandler;
-import com.mdc.mim.netty.client.handler.ExceptionHandler;
-import com.mdc.mim.netty.client.handler.LoginOutResponesHandler;
+import com.mdc.mim.netty.client.handler.*;
 import com.mdc.mim.netty.client.sender.ChatMessageSender;
-import com.mdc.mim.netty.client.sender.LoginOutSender;
+import com.mdc.mim.netty.client.sender.LogInOutSender;
 import com.mdc.mim.netty.codec.KryoContentDecoder;
 import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
 import com.mdc.mim.netty.session.ClientSession;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -56,10 +54,12 @@ public class NettyClient {
     @Autowired
     private ChatMessageResponseHandler chatMessageResponseHandler;
     @Autowired
-    private ClientHeartbeatHandler clientHeartbeatHandler;
+    private ClientHeartBeatTrigger clientHeartbeatTrigger;
+    @Autowired
+    private ClientHeartBeatPingHandler clientHeartBeatPingHandler;
     // senders of netty
     @Autowired
-    private LoginOutSender loginoutSender;
+    private LogInOutSender loginoutSender;
     @Autowired
     private ChatMessageSender chatMessageSender;
 
@@ -81,10 +81,10 @@ public class NettyClient {
     GenericFutureListener<ChannelFuture> connectedListener = (ChannelFuture f) -> {
         final EventLoop eventLoop = f.channel().eventLoop();
         if (!f.isSuccess()) {
-            log.info("Connect failed, retry in 10 sec");
+            log.info("Connect failed, retry in 5 sec");
             eventLoop.schedule(
                     () -> doConnect(),
-                    10,
+                    5,
                     TimeUnit.SECONDS);
         } else {
             log.info("Successfully connected IM server!");
@@ -119,6 +119,10 @@ public class NettyClient {
                     new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
+                            ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(0, 5, 0, TimeUnit.SECONDS));
+                            // 心跳相关
+                            ch.pipeline().addLast("heartBeatTrigger", clientHeartbeatTrigger);
+                            ch.pipeline().addLast("heartBeatPing", clientHeartBeatPingHandler);
                             // 解编码
                             // 入站
                             ch.pipeline().addLast("mimDecoder", new MIMByteDecoder());

@@ -35,7 +35,7 @@ public class LoginOutResponesHandler extends ChannelInboundHandlerAdapter {
                 clientSession.setSessionId(sessionId);
                 clientSession.setHasLogined(true);
                 // 添加心跳处理器
-                pipeline.addAfter("kryoEncoder", "heartbeatHandler", new ClientHeartbeatHandler());
+                pipeline.addAfter("kryoEncoder", "heartbeatHandler", new ClientHeartBeatTrigger());
                 log.info("added heartbeat handler");
             } else {
                 log.error("login failed: {}", loginResp.getInfo());

@@ -37,8 +37,6 @@ public class NettyServer {
     private int port;
     // handlers
     @Autowired
-    private ChatMessageRequestHandler chatMessageRequestHandler;
-    @Autowired
     private ChatMessageRedirectHandler chatMessageRedirectHandler;
     @Autowired
     private LoginOutRequestHandler loginOutRequestHandler;
@@ -59,6 +57,8 @@ public class NettyServer {
             b.childHandler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
+                    // 心跳相关
+
                     // 解编码
                     // inbouund
                     ch.pipeline().addLast(new MIMByteDecoder());

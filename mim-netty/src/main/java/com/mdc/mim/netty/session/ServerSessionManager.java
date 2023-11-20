@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServerSessionManager {
     ConcurrentMap<String, ServerSession> sessionMap = new ConcurrentHashMap<>();
-
     public boolean contains(String sessionId) {
         return sessionId != null && sessionMap.containsKey(sessionId);
     }
