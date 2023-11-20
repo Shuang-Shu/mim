@@ -1,5 +1,7 @@
 package com.mdc.mim.netty.client.handler;
 
+import com.mdc.mim.common.constant.HeartBeatConstant;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.concurrent.Future;
@@ -17,8 +19,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
-public class ClientHeartBeatPingHandler extends ChannelInboundHandlerAdapter {
-    private static final int DELAY_TIME = 2;
+@ChannelHandler.Sharable
+public class ClientHeartBeatSendingHandler extends ChannelInboundHandlerAdapter {
     public static final String HEART_BEAT = "heartBeat";
 
     @Override
@@ -39,9 +41,8 @@ public class ClientHeartBeatPingHandler extends ChannelInboundHandlerAdapter {
                     ctx.channel().close();
                     throw new RuntimeException("server is not active, close this channel");
                 }
-
             }
-        }, DELAY_TIME, TimeUnit.SECONDS);
+        }, HeartBeatConstant.HEART_BEAT_TIME, TimeUnit.SECONDS);
         future.addListener(
                 new GenericFutureListener() {
                     public void operationComplete(Future future) throws Exception {

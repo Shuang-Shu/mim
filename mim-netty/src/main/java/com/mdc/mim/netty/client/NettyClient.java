@@ -3,6 +3,7 @@ package com.mdc.mim.netty.client;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import com.mdc.mim.common.constant.HeartBeatConstant;
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.netty.client.handler.*;
 import com.mdc.mim.netty.client.sender.ChatMessageSender;
@@ -54,9 +55,9 @@ public class NettyClient {
     @Autowired
     private ChatMessageResponseHandler chatMessageResponseHandler;
     @Autowired
-    private ClientHeartBeatTrigger clientHeartbeatTrigger;
+    private ClientHeartBeatTimeoutHandler clientHeartbeatTimeoutHandler;
     @Autowired
-    private ClientHeartBeatPingHandler clientHeartBeatPingHandler;
+    private ClientHeartBeatSendingHandler clientHeartBeatSendingHandler;
     // senders of netty
     @Autowired
     private LogInOutSender loginoutSender;
@@ -119,10 +120,10 @@ public class NettyClient {
                     new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(0, 5, 0, TimeUnit.SECONDS));
+                            ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(0, HeartBeatConstant.WRITE_IDLE_TIME, 0, TimeUnit.SECONDS));
                             // 心跳相关
-                            ch.pipeline().addLast("heartBeatTrigger", clientHeartbeatTrigger);
-                            ch.pipeline().addLast("heartBeatPing", clientHeartBeatPingHandler);
+                            ch.pipeline().addLast("heartBeatTrigger", clientHeartbeatTimeoutHandler);
+                            ch.pipeline().addLast("heartBeatPing", clientHeartBeatSendingHandler);
                             // 解编码
                             // 入站
                             ch.pipeline().addLast("mimDecoder", new MIMByteDecoder());

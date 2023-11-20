@@ -1,6 +1,7 @@
 package com.mdc.mim.netty.client.handler;
 
 import com.mdc.mim.common.constant.ResponsesCodeEnum;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -8,12 +9,11 @@ import com.mdc.mim.common.constant.MessageTypeEnum;
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.netty.session.ClientSession;
 
-import io.netty.channel.ChannelHandler.Sharable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Sharable
+@ChannelHandler.Sharable
 @Component
 public class LoginOutResponesHandler extends ChannelInboundHandlerAdapter {
     @Override
@@ -35,7 +35,7 @@ public class LoginOutResponesHandler extends ChannelInboundHandlerAdapter {
                 clientSession.setSessionId(sessionId);
                 clientSession.setHasLogined(true);
                 // 添加心跳处理器
-                pipeline.addAfter("kryoEncoder", "heartbeatHandler", new ClientHeartBeatTrigger());
+                pipeline.addAfter("kryoEncoder", "heartbeatHandler", new ClientHeartBeatTimeoutHandler());
                 log.info("added heartbeat handler");
             } else {
                 log.error("login failed: {}", loginResp.getInfo());

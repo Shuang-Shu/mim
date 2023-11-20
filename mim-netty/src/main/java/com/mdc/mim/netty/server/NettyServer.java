@@ -14,10 +14,13 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -44,6 +47,8 @@ public class NettyServer {
     private LogoutRequestHandler logoutRequestHandler;
     @Autowired
     private ServerExceptionHandler serverExceptionHandler;
+    @Autowired
+    private ServerHeartBeatTimeoutHandler serverHeartBeatTimeoutHandler;
     private ServerBootstrap b = new ServerBootstrap();
 
     public void start() {
@@ -58,7 +63,8 @@ public class NettyServer {
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
                     // 心跳相关
-
+                    ch.pipeline().addLast(new IdleStateHandler(2, 0, 0, TimeUnit.SECONDS));
+                    ch.pipeline().addLast(serverHeartBeatTimeoutHandler);
                     // 解编码
                     // inbouund
                     ch.pipeline().addLast(new MIMByteDecoder());

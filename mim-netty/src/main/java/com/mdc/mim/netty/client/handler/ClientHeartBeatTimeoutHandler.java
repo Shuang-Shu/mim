@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @ChannelHandler.Sharable
-public class ClientHeartBeatTrigger extends ChannelInboundHandlerAdapter {
+public class ClientHeartBeatTimeoutHandler extends ChannelInboundHandlerAdapter {
     /**
      * @description: 如果接收到IdleState.WRITE_IDLE事件，则向服务器发送一个心跳包
      * @param:
@@ -25,7 +25,7 @@ public class ClientHeartBeatTrigger extends ChannelInboundHandlerAdapter {
             log.info("user event triggered: {}", evt);
             var state = (IdleStateEvent) evt;
             if (state.state() == IdleState.WRITER_IDLE) {
-                ctx.writeAndFlush(ClientHeartBeatPingHandler.HEART_BEAT);
+                ctx.writeAndFlush(ClientHeartBeatSendingHandler.HEART_BEAT);
             }
         } else {
             super.userEventTriggered(ctx, evt);
