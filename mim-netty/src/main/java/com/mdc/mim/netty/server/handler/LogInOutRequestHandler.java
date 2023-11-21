@@ -5,6 +5,7 @@ import com.mdc.mim.common.concurrent.CallbackTask;
 import com.mdc.mim.common.constant.MessageTypeEnum;
 import com.mdc.mim.common.dto.Message;
 
+import com.mdc.mim.common.utils.IDUtils;
 import com.mdc.mim.netty.server.processor.LogoutProcessor;
 import com.mdc.mim.netty.session.ServerSession;
 import com.mdc.mim.netty.session.ServerSessionManager;
@@ -19,7 +20,7 @@ import com.mdc.mim.netty.server.processor.LoginProcessor;
 @Slf4j
 @Component
 @ChannelHandler.Sharable
-public class LoginOutRequestHandler extends ChannelInboundHandlerAdapter {
+public class LogInOutRequestHandler extends ChannelInboundHandlerAdapter {
     @Autowired
     private ServerSessionManager sessionManager;
 
@@ -42,9 +43,16 @@ public class LoginOutRequestHandler extends ChannelInboundHandlerAdapter {
         if (message.getMessageType().equals(MessageTypeEnum.LOGIN_REQ)) {
             log.info("successfully receiving loginRequest(server)");
             log.debug("successfully receiving loginRequest(server): {}", msg);
-
-            var loginReq = (Message.LoginRequest) ((Message) msg).getLoginRequest();
-            var serverSession = new ServerSession(ctx.channel(), loginReq.getUser());
+            ServerSession serverSession = null;
+            if (message.getSessionId() != null) {
+                serverSession = sessionManager.getSession(message.getSessionId());
+            }
+            if (serverSession == null) {
+                serverSession = new ServerSession(ctx.channel());
+                serverSession.setSessionId(IDUtils.getSessionId());
+                sessionManager.addSession(serverSession.getSessionId(), serverSession);
+            }
+            final var session = serverSession;
             // 1 异步处理认证流程
             CallbackExecutor.instance().execute(
                     new CallbackTask<Boolean>() {
@@ -54,6 +62,7 @@ public class LoginOutRequestHandler extends ChannelInboundHandlerAdapter {
                                 log.info("login success");
                             } else {
                                 log.error("login failed");
+                                sessionManager.removeSession(session.getSessionId());
                             }
                         }
 
@@ -65,7 +74,7 @@ public class LoginOutRequestHandler extends ChannelInboundHandlerAdapter {
 
                         @Override
                         public Boolean call() throws Exception {
-                            return loginProcessor.process(serverSession, (Message) msg);
+                            return loginProcessor.process(session, (Message) msg);
                         }
                     }
             );
@@ -75,7 +84,7 @@ public class LoginOutRequestHandler extends ChannelInboundHandlerAdapter {
 
             var serverSession = sessionManager.getSession(message.getSessionId());
             if (serverSession == null) {
-                serverSession = new ServerSession(ctx.channel(), message.getLogoutRequest().getUser());
+                serverSession = new ServerSession(ctx.channel());
             }
             final var session = serverSession;
 

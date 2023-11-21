@@ -2,73 +2,54 @@ package com.mdc.mim.netty.session;
 
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.dto.UserDTO;
-import com.mdc.mim.user.entity.UserEntity;
 
+import com.mdc.mim.netty.session.state.IClientSessionState;
+import com.mdc.mim.netty.session.state.impl.client.ClientNotLoginState;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.util.AttributeKey;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 胶水类，用于保存用户信息和连接通道，同时记录连接状态，
+ * 胶水类，该类是对会话的抽象，其用于保存用户信息和连接通道，同时记录连接状态，
  * 该类同时还与确定的通道绑定，负责相互信息的交换
- * **注意：** 该类不建立连接，但负责关闭连接
  */
 @Slf4j
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@AllArgsConstructor
-public class ClientSession {
-    public static final AttributeKey<ClientSession> SESSION_KEY = AttributeKey.valueOf("SESSION_KEY");
-    private UserDTO user;
-    private String sessionId;
-    private boolean hasLogined;
-    private Channel channel;
-    private boolean connected = false;
-
-    public ClientSession(Channel channel, UserDTO user) {
+public class ClientSession extends AbstractSession implements IClientSessionState {
+    public ClientSession(Channel channel) {
         this.channel = channel;
-        this.user = user;
-        this.connected = true;
+        this.state = new ClientNotLoginState(this);
         // 将ClientSession绑定到channel
-        this.channel.attr(SESSION_KEY).set(this);
-    }
-
-    public void bindChannel() {
-        channel.attr(SESSION_KEY).set(this);
-    }
-
-    public ChannelFuture writeAndFlush(Object pojo) {
-        return channel.writeAndFlush(pojo);
-    }
-
-    public void writeAndClose(Object pojo) {
-        var cf = channel.writeAndFlush(pojo);
-        cf.addListener(ChannelFutureListener.CLOSE); // 添加关闭Listener
+        this.bindChannel(channel);
     }
 
     public void loginSuccess(Message message) {
-        this.sessionId = message.getSessionId(); // 获取sessionId
-        this.hasLogined = true;
+        this.sessionId = message.getLoginResponse().getSessionId(); // 获取sessionId
+        state.logoutSuccess(message);
     }
 
-    public void close() {
-        connected = false;
+    @Override
+    public void logoutSuccess(Message message) {
+        state.logoutSuccess(message);
+    }
 
-        var cf = channel.close();
-        cf.addListener(new ChannelFutureListener() {
+    @Override
+    public String stateDescription() {
+        return state.stateDescription();
+    }
 
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
-                if (cf.isSuccess()) {
-                    log.info("has closed session");
-                }
-            }
+    @Override
+    public void sendFail() {
+        ((IClientSessionState) state).sendFail();
+    }
 
-        });
+    @Override
+    public void connectSuccess() {
+        ((IClientSessionState) state).connectSuccess();
     }
 }

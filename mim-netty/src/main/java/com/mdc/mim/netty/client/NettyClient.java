@@ -12,6 +12,8 @@ import com.mdc.mim.netty.codec.KryoContentDecoder;
 import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
 import com.mdc.mim.netty.session.ClientSession;
+import com.mdc.mim.netty.session.state.impl.client.ClientLoginState;
+import com.mdc.mim.netty.session.state.impl.client.ClientNotConnectState;
 import io.netty.handler.timeout.IdleStateHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +51,7 @@ public class NettyClient {
     private int port;
     // handlers of netty
     @Autowired
-    private LoginOutResponesHandler loginOutResponesHandler;
+    private LogInOutResponesHandler loginOutResponesHandler;
     @Autowired
     private ExceptionHandler exceptionHandler;
     @Autowired
@@ -69,12 +71,12 @@ public class NettyClient {
     // netty相关
     private Bootstrap b;
     private EventLoopGroup g = new NioEventLoopGroup();
-    // 连接通道相关
+    // 客户端会话
     private ClientSession clientSession;
 
     // listener定义
     GenericFutureListener<ChannelFuture> closeListener = (ChannelFuture f) -> {
-        log.info(new Date() + ": connection cloesd...s");
+        log.info(new Date() + ": connection cloesd...");
         // 关闭会话
         clientSession.close();
     };
@@ -88,18 +90,17 @@ public class NettyClient {
                     5,
                     TimeUnit.SECONDS);
         } else {
+            // 连接成功，创建ClientSession
             log.info("Successfully connected IM server!");
             var channel = f.channel();
             // 创建会话
-            clientSession = new ClientSession(channel, user);
-            clientSession.setConnected(true);
+            clientSession = new ClientSession(channel);
             // 为sender添加通道
             this.loginoutSender.setClientSession(clientSession);
             this.chatMessageSender.setClientSession(clientSession);
             // 添加close listener
             channel.closeFuture().addListener(closeListener);
         }
-
     };
 
     public ChannelFuture doConnect() {
@@ -120,8 +121,8 @@ public class NettyClient {
                     new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(0, HeartBeatConstant.WRITE_IDLE_TIME, 0, TimeUnit.SECONDS));
                             // 心跳相关
+                            ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(0, HeartBeatConstant.WRITE_IDLE_TIME, 0, TimeUnit.SECONDS));
                             ch.pipeline().addLast("heartBeatTrigger", clientHeartbeatTimeoutHandler);
                             ch.pipeline().addLast("heartBeatPing", clientHeartBeatSendingHandler);
                             // 解编码
@@ -152,7 +153,7 @@ public class NettyClient {
      * 发送登录消息
      */
     public ChannelFuture doLogin() {
-        if (clientSession == null || !clientSession.isHasLogined()) {
+        if (clientSession == null || !(clientSession.getState() instanceof ClientLoginState)) {
             log.error("has not login yet");
         }
         return loginoutSender.sendLogin(user);
@@ -166,7 +167,7 @@ public class NettyClient {
      * @date: 2023/11/15 18:54
      */
     public ChannelFuture doLogout() {
-        if (clientSession == null || !clientSession.isConnected()) {
+        if (clientSession == null || (clientSession.getState() instanceof ClientNotConnectState)) {
             log.error("connecting {}:{} failed", host, port);
         }
         return loginoutSender.sendLogout(user);
@@ -179,9 +180,17 @@ public class NettyClient {
      * @param content
      */
     public ChannelFuture doSend(Long toUid, String content) {
-        if (clientSession == null || !clientSession.isConnected()) {
+        if (clientSession == null || (clientSession.getState() instanceof ClientNotConnectState)) {
             log.error("connecting {}:{} failed", host, port);
         }
         return chatMessageSender.sendChatMessage(toUid, content);
+    }
+
+    public void close() {
+        try {
+            clientSession.close();
+        } finally {
+            g.shutdownGracefully();
+        }
     }
 }

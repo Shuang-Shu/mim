@@ -27,7 +27,7 @@ public class LogoutProcessor implements AbstractProcessor {
     }
 
     @Override
-    public Boolean process(ServerSession session, Message message) {
+    public Boolean process(ServerSession serverSession, Message message) {
         var logoutReq = message.getLogoutRequest();
         var logoutResp = Message.LogoutResponse.builder().id(logoutReq.getId()).build();
         var respMessage = Message.builder().messageType(MessageTypeEnum.LOGOUT_RESP).logoutResponse(logoutResp).build();
@@ -36,17 +36,15 @@ public class LogoutProcessor implements AbstractProcessor {
             logoutResp.setCode(ResponsesCodeEnum.SUCCESS);
             // 发送消息
             try {
-                session.writeAndFlush(respMessage).sync();
-                session.close();
+                serverSession.writeAndFlush(respMessage).sync();
+                serverSession.logoutSuccess(message);
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                session.close();
             }
             return true;
         } else {
             logoutResp.setCode(ResponsesCodeEnum.FAILED);
-            logoutResp.setInfo("user:" + logoutReq.getUser().getUserName() + " is not login");
+            logoutResp.setInfo("user: " + logoutReq.getUser().getUserName() + " is not login");
         }
         return false;
     }

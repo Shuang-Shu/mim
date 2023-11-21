@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.apache.catalina.User;
 
 @Data
 @Builder
@@ -62,6 +63,7 @@ public class Message {
     public static class LoginResponse {
         long id;
         ResponsesCodeEnum code;
+        UserDTO user;
         String info;
         String sessionId;
         int expose; // 存疑

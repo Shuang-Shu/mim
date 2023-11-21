@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @ChannelHandler.Sharable
 @Component
-public class LoginOutResponesHandler extends ChannelInboundHandlerAdapter {
+public class LogInOutResponesHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         var message = (Message) msg;
@@ -23,19 +23,14 @@ public class LoginOutResponesHandler extends ChannelInboundHandlerAdapter {
             super.channelRead(ctx, msg); // 将消息传递给下一个handler
             return;
         }
+        var clientSession = ctx.channel().attr(ClientSession.SESSION_KEY).get();
         if (message.getMessageType().equals(MessageTypeEnum.LOGIN_RESP)) {
             log.debug("client receive login response: {}", msg);
             var loginResp = message.getLoginResponse();
+            clientSession.setSessionId(message.getLoginResponse().getSessionId());
             if (loginResp.getCode().equals(ResponsesCodeEnum.SUCCESS)) {
-                var pipeline = ctx.pipeline();
-                // 注册对应的sessionId
-                var sessionId = message.getLoginResponse().getSessionId();
-                // 设置sessionId
-                var clientSession = ctx.channel().attr(ClientSession.SESSION_KEY).get();
-                clientSession.setSessionId(sessionId);
-                clientSession.setHasLogined(true);
-                // 添加心跳处理器
-                pipeline.addAfter("kryoEncoder", "heartbeatHandler", new ClientHeartBeatTimeoutHandler());
+                // 设置会话的sessionId
+                clientSession.getState().loginSuccess(message);
                 log.info("added heartbeat handler");
             } else {
                 log.error("login failed: {}", loginResp.getInfo());
@@ -44,14 +39,8 @@ public class LoginOutResponesHandler extends ChannelInboundHandlerAdapter {
             log.debug("client receive logout response: {}", msg);
             var logoutResp = message.getLogoutResponse();
             if (logoutResp.getCode().equals(ResponsesCodeEnum.SUCCESS)) {
-                var pipeline = ctx.pipeline();
-                // 设置sessionId
-                var clientSession = ctx.channel().attr(ClientSession.SESSION_KEY).get();
-                clientSession.setSessionId(null);
-                clientSession.setHasLogined(false);
-                // 已登出，删除心跳处理器
-                pipeline.remove("heartbeatHandler");
-                log.info("removed heartbeat handler");
+                // Client状态转换为未登录
+                clientSession.getState().logoutSuccess(message);
             } else {
                 log.error("logout failed: {}", logoutResp.getInfo());
             }

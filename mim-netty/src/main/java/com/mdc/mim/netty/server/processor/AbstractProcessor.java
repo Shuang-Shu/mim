@@ -13,5 +13,5 @@ import com.mdc.mim.netty.session.ServerSession;
 public interface AbstractProcessor {
     MessageTypeEnum supportType();
 
-    Boolean process(ServerSession session, Message message);
+    Boolean process(ServerSession serverSession, Message message);
 }

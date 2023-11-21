@@ -32,15 +32,15 @@ public class ChatMessageRedirectHandler extends ChannelInboundHandlerAdapter {
                     @Override
                     public void onBack(Boolean success) {
                         if (success) {
-                            log.info("login success");
+                            log.info("redirect message success");
                         } else {
-                            log.error("login failed");
+                            log.error("redirect message failed");
                         }
                     }
 
                     @Override
                     public void onException(Throwable t) {
-                        log.error("login failed", t);
+                        log.error("redirect message failed", t);
                     }
 
                     @Override

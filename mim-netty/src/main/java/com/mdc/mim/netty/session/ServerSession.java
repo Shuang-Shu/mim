@@ -1,55 +1,40 @@
 package com.mdc.mim.netty.session;
 
-import com.mdc.mim.common.dto.UserDTO;
+import com.mdc.mim.common.dto.Message;
+import com.mdc.mim.netty.session.state.IServerSessionState;
+import com.mdc.mim.netty.session.state.ISessionState;
+import com.mdc.mim.netty.session.state.impl.client.ClientNotLoginState;
+import com.mdc.mim.netty.session.state.impl.server.ServerNotLoginState;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.util.AttributeKey;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@AllArgsConstructor
-public class ServerSession {
-    public static final AttributeKey<ServerSession> SESSION_KEY = AttributeKey.valueOf("SERVER_SESSION_KEY");
-    private UserDTO user;
-    private String sessionId;
-    private Channel channel;
-
-    public ServerSession(Channel channel, UserDTO user) {
+public class ServerSession extends AbstractSession implements IServerSessionState {
+    public ServerSession(Channel channel) {
         this.channel = channel;
-        this.user = user;
-        // 将ClientSession绑定到channel
-        this.channel.attr(SESSION_KEY).set(this);
+        this.state = new ServerNotLoginState(this);
+        // 将当前ServerSession绑定到channel中
+        this.bindChannel(channel);
     }
 
-    public void bindChannel() {
-        channel.attr(SESSION_KEY).set(this);
+    @Override
+    public void loginSuccess(Message message) {
+        state.loginSuccess(message);
     }
 
-    public ChannelFuture writeAndFlush(Object pojo) {
-        return channel.writeAndFlush(pojo);
+    @Override
+    public void logoutSuccess(Message message) {
+        state.logoutSuccess(message);
     }
 
-    public void writeAndClose(Object pojo) {
-        var cf = channel.writeAndFlush(pojo);
-        cf.addListener(ChannelFutureListener.CLOSE); // 添加关闭Listener
-    }
-
-    public void close() {
-        var cf = channel.closeFuture();
-        cf.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
-                if (cf.isSuccess()) {
-                    log.info("has closed session");
-                }
-            }
-
-        });
+    @Override
+    public String stateDescription() {
+        return state.stateDescription();
     }
 }

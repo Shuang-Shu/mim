@@ -24,7 +24,7 @@ public class UserLoginController {
         if (user == null || !passwdMd5.equals(user.getPasswdMd5())) {
             return R.ok().put("valid", false);
         } else {
-            return R.ok().put("valid", true);
+            return R.ok().put("valid", true).put("user", user);
         }
     }
 }

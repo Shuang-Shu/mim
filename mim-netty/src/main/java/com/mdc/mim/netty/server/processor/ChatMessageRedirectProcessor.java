@@ -17,7 +17,7 @@ public class ChatMessageRedirectProcessor implements AbstractProcessor {
     }
 
     @Override
-    public Boolean process(ServerSession session, Message message) {
+    public Boolean process(ServerSession serverSession, Message message) {
         var messageReq = message.getMessageRequest();
         var messageResp = Message.MessageResponse.builder().id(messageReq.getId()).info("redirected message").build();
         var respMessge = Message.builder().messageType(MessageTypeEnum.MESSAGE_RESP).messageResponse(messageResp).build();

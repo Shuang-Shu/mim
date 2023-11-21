@@ -5,6 +5,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.netty.session.ClientSession;
 
+import com.mdc.mim.netty.session.state.impl.client.ClientLoginState;
+import com.mdc.mim.netty.session.state.impl.client.ClientNotConnectState;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -26,7 +28,7 @@ public abstract class AbstractSender {
      */
     public ChannelFuture sendMessage(Object msg) {
         // 目前使用同步的方式发送请求
-        if (null == getClientSession() || !getClientSession().isConnected()) {
+        if (null == getClientSession() || (getClientSession().getState() instanceof ClientNotConnectState)) {
             log.info("connection is not established yet!");
             return null;
         }
@@ -56,7 +58,6 @@ public abstract class AbstractSender {
     }
 
     protected UserDTO getUser() {
-        return clientSession.getUser();
+        return ((ClientLoginState) clientSession.getState()).getUser();
     }
-
 }

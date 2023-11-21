@@ -1,5 +1,6 @@
 package com.mdc.mim.netty.server;
 
+import com.mdc.mim.common.constant.HeartBeatConstant;
 import com.mdc.mim.netty.codec.KryoContentDecoder;
 import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
@@ -7,6 +8,7 @@ import com.mdc.mim.netty.codec.MIMByteEncoder;
 import com.mdc.mim.common.constant.CommonConstant;
 import com.mdc.mim.netty.server.handler.*;
 
+import com.mdc.mim.netty.session.ServerSessionManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
@@ -15,6 +17,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,11 +27,8 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
+@NoArgsConstructor
 public class NettyServer {
-
-    public NettyServer() {
-    }
-
     public NettyServer(String host, int port) {
         this.host = host;
         this.port = port;
@@ -42,13 +42,13 @@ public class NettyServer {
     @Autowired
     private ChatMessageRedirectHandler chatMessageRedirectHandler;
     @Autowired
-    private LoginOutRequestHandler loginOutRequestHandler;
-    @Autowired
-    private LogoutRequestHandler logoutRequestHandler;
+    private LogInOutRequestHandler loginOutRequestHandler;
     @Autowired
     private ServerExceptionHandler serverExceptionHandler;
     @Autowired
     private ServerHeartBeatTimeoutHandler serverHeartBeatTimeoutHandler;
+    @Autowired
+    private ServerSessionManager sessionManager;
     private ServerBootstrap b = new ServerBootstrap();
 
     public void start() {
@@ -63,7 +63,7 @@ public class NettyServer {
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
                     // 心跳相关
-                    ch.pipeline().addLast(new IdleStateHandler(2, 0, 0, TimeUnit.SECONDS));
+                    ch.pipeline().addLast(new IdleStateHandler(HeartBeatConstant.READ_IDLE_TIME, 0, 0, TimeUnit.SECONDS));
                     ch.pipeline().addLast(serverHeartBeatTimeoutHandler);
                     // 解编码
                     // inbouund
@@ -75,6 +75,8 @@ public class NettyServer {
                     // handlers
                     ch.pipeline().addLast(loginOutRequestHandler);
                     ch.pipeline().addLast(chatMessageRedirectHandler);
+                    // exception
+                    ch.pipeline().addLast(serverExceptionHandler);
                 }
             });
             var channelFuture = b.bind(this.host, this.port).sync();
@@ -85,6 +87,14 @@ public class NettyServer {
         } finally {
             bossLoopGroup.shutdownGracefully();
             workerLoopGroup.shutdownGracefully();
+        }
+    }
+
+    public void closeServerSession(String sessionId) {
+        var session = sessionManager.getSession(sessionId);
+        if (session != null) {
+            session.close();
+            sessionManager.removeSession(sessionId);
         }
     }
 }

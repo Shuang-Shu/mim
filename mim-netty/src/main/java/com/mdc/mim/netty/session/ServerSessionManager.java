@@ -22,8 +22,8 @@ public class ServerSessionManager {
         }
     }
 
-    public void addSession(String sessionId, ServerSession session) {
-        sessionMap.put(sessionId, session);
+    public void addSession(String sessionId, ServerSession serverSession) {
+        sessionMap.put(sessionId, serverSession);
     }
 
     public void removeSession(String sessionId) {

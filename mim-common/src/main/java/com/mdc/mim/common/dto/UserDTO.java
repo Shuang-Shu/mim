@@ -1,5 +1,6 @@
 package com.mdc.mim.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.mdc.mim.common.constant.Platform;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDTO {
     private Long uid;
     private String userName;

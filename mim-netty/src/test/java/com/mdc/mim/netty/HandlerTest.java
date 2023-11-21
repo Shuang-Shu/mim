@@ -12,7 +12,7 @@ import com.mdc.mim.common.constant.CommonConstant;
 import com.mdc.mim.common.constant.MessageTypeEnum;
 import com.mdc.mim.common.constant.Platform;
 import com.mdc.mim.common.dto.Message;
-import com.mdc.mim.netty.server.handler.LoginOutRequestHandler;
+import com.mdc.mim.netty.server.handler.LogInOutRequestHandler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -49,7 +49,7 @@ public class HandlerTest {
                         for (var handler : channelHandlers) {
                             ch.pipeline().addLast(handler);
                         }
-                        ch.pipeline().addLast(new LoginOutRequestHandler());
+                        ch.pipeline().addLast(new LogInOutRequestHandler());
                     }
                 });
         var message = Message.builder().loginRequest(loginReq).messageType(MessageTypeEnum.LOGIN_REQ).build();

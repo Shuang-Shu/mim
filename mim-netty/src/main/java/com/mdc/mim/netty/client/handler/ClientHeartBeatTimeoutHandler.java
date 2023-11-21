@@ -1,5 +1,6 @@
 package com.mdc.mim.netty.client.handler;
 
+import com.mdc.mim.netty.session.ClientSession;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -25,7 +26,9 @@ public class ClientHeartBeatTimeoutHandler extends ChannelInboundHandlerAdapter 
             log.info("user event triggered: {}", evt);
             var state = (IdleStateEvent) evt;
             if (state.state() == IdleState.WRITER_IDLE) {
-                ctx.writeAndFlush(ClientHeartBeatSendingHandler.HEART_BEAT);
+                var clientSession = ctx.channel().attr(ClientSession.SESSION_KEY).get();
+                // 关闭客户端Session
+                clientSession.close();
             }
         } else {
             super.userEventTriggered(ctx, evt);
