@@ -62,31 +62,6 @@ public class LoginProcessor implements AbstractProcessor {
             result = true;
         }
 
-        // --------
-//        // 1 检查是否已登录
-//        if (!sessionManager.contains(message.getSessionId())) {
-//            // 未登录
-//            var user = loginReq.getUser();
-//            var r = userLoginService.identify(user.getUserName(), user.getPasswdMd5());
-//            var ok = (Boolean) r.get("valid");
-//            if (!ok) {
-//                loginResp.setCode(ResponsesCodeEnum.FAILED);
-//                loginResp.setInfo("identify failed, wrong username or password");
-//            } else {
-//                loginResp.setSessionId(IDUtils.getSessionId());
-//                loginResp.setCode(ResponsesCodeEnum.SUCCESS);
-//                // TODO 此处暂时手动进行类型转换
-//                var objectMapper = new ObjectMapper();
-//                var userDto = objectMapper.convertValue(r.get("user"), UserDTO.class);
-//                loginResp.setUser(userDto);
-//                sessionManager.addSession(loginResp.getSessionId(), serverSession);
-//                result = true;
-//            }
-//        } else {
-//            // 已登录
-//            loginResp.setCode(ResponsesCodeEnum.SUCCESS);
-//            result = true;
-//        }
         var f = serverSession.writeAndFlush(respMessage);
         f.addListener(
                 new GenericFutureListener<Future<? super Void>>() {

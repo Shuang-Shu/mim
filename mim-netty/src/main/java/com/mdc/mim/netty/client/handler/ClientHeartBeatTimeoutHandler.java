@@ -28,6 +28,7 @@ public class ClientHeartBeatTimeoutHandler extends ChannelInboundHandlerAdapter 
             if (state.state() == IdleState.WRITER_IDLE) {
                 var clientSession = ctx.channel().attr(ClientSession.SESSION_KEY).get();
                 // 关闭客户端Session
+                // TODO 此处应当执行重连逻辑，而非直接关闭客户端
                 clientSession.close();
             }
         } else {
