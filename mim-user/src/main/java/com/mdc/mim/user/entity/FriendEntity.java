@@ -1,5 +1,7 @@
 package com.mdc.mim.user.entity;
 
+import lombok.Data;
+
 import java.util.Date;
 
 /**
@@ -8,7 +10,8 @@ import java.util.Date;
  * @description: 好友关系实体类
  * @date 2023/11/21 21:53
  */
-public class FirendEntity {
+@Data
+public class FriendEntity {
     private Long uid;
     private Long friendUid;
     private Date createTime;

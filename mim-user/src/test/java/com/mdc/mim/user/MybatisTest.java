@@ -2,6 +2,8 @@ package com.mdc.mim.user;
 
 import java.sql.Date;
 
+import com.mdc.mim.user.mapper.FriendEntityMapper;
+import com.mdc.mim.user.mapper.UserStatusMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,10 @@ public class MybatisTest {
     private UserLoginMapper userLoginMapper;
     @Autowired
     private UserEntityMapper userEntityMapper;
+    @Autowired
+    private UserStatusMapper userStatusMapper;
+    @Autowired
+    private FriendEntityMapper friendEntityMapper;
 
     @Test
     public void basicTest() {
@@ -57,12 +63,46 @@ public class MybatisTest {
 
     @Test
     public void testUserEntityMapper() {
-        var users = userEntityMapper.queryAll();
+        var users = userEntityMapper.findAll();
         Assertions.assertEquals(4, users.size());
-        userEntityMapper.addAll(users);
+        userEntityMapper.insertUsers(users);
         Assertions.assertNotEquals(1, users.get(0).getUid());
         userEntityMapper.deleteByIds(users.stream().map(u -> u.getUid()).toList());
-        users = userEntityMapper.queryAll();
+        users = userEntityMapper.findAll();
         Assertions.assertEquals(4, users.size());
+    }
+
+    // userStatus相关测试
+    // friend相关测试
+    @Test
+    public void testBasicFriends() {
+        var friends = friendEntityMapper.findAll();
+        Assertions.assertEquals(6, friends.size());
+    }
+
+    @Test
+    public void testInsertFriends() {
+        var friends = friendEntityMapper.findAll();
+        var friend = friends.get(0);
+        var ret = friendEntityMapper.deleteByUidAndFriendUid(friend.getUid(), friend.getFriendUid());
+        Assertions.assertEquals(1, ret);
+        ret = friendEntityMapper.insertFriend(friend);
+        Assertions.assertEquals(1, ret);
+    }
+
+    @Test
+    public void testUpdateFriends() {
+        var friends = friendEntityMapper.findAll();
+        var friend = friends.get(0);
+        var oldCreateTime = friend.getCreateTime();
+        var newCreateTime = new Date(System.currentTimeMillis());
+        friend.setCreateTime(newCreateTime);
+        var ret = friendEntityMapper.updateFriend(friend);
+        Assertions.assertEquals(1, ret);
+        friend = friendEntityMapper.findByUidAndFriendUid(friend.getUid(), friend.getFriendUid());
+        Assertions.assertNotEquals(newCreateTime, friend.getCreateTime());
+        friend.setCreateTime(oldCreateTime);
+        ret = friendEntityMapper.updateFriend(friend);
+        Assertions.assertEquals(1, ret);
     }
 }
