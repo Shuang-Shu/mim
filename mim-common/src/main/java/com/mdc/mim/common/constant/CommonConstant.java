@@ -26,7 +26,7 @@ public class CommonConstant {
     public static final int CONTENT_LENGTH = 4;
 
     private static final Class<?>[] messageClasses = {
-            Message.class, Message.ChatMessageType.class, MessageTypeEnum.class, ResponsesCodeEnum.class, UserDTO.class,
+            String.class, Message.class, Message.ChatMessageType.class, MessageTypeEnum.class, ResponsesCodeEnum.class, UserDTO.class,
             LoginRequest.class, LoginResponse.class, LogoutRequest.class,
             LogoutResponse.class,
             KeepAliveRequest.class, KeepAliveResponse.class,

@@ -32,10 +32,16 @@ public class LogInOutRequestHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (msg == null || !(msg instanceof Message)) {
+            super.channelRead(ctx, msg);
+            return;
+        }
         var message = (Message) msg;
+        if (message.getMessageType() == null) {
+            return;
+        }
         // 0 判断消息是否为Message.LoginRequest
-        if (msg == null || !(msg instanceof Message)
-                || (!message.getMessageType().equals(MessageTypeEnum.LOGIN_REQ) && !message.getMessageType().equals(MessageTypeEnum.LOGOUT_REQ))) {
+        if (message.getMessageType() == null || !message.getMessageType().equals(MessageTypeEnum.LOGIN_REQ) && !message.getMessageType().equals(MessageTypeEnum.LOGOUT_REQ)) {
             super.channelRead(ctx, msg);
             return;
         }

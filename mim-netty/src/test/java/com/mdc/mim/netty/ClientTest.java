@@ -23,8 +23,7 @@ public class ClientTest implements InitializingBean {
     @Autowired
     NettyServer nettyServer;
 
-    @Autowired
-    NettyClient nettyClient;
+    NettyClient nettyClient = new NettyClient("localhost", 8080);
 
     @Override
     public void afterPropertiesSet() throws Exception {

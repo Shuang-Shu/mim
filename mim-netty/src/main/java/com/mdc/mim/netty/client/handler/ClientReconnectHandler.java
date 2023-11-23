@@ -22,10 +22,12 @@ import java.util.concurrent.TimeUnit;
  */
 @Data
 @Slf4j
-@Component
 @ChannelHandler.Sharable
 public class ClientReconnectHandler extends ChannelInboundHandlerAdapter {
-    @Autowired
+    public ClientReconnectHandler(NettyClient nettyClient) {
+        this.nettyClient = nettyClient;
+    }
+
     private NettyClient nettyClient;
     private IRetryPolicy retryPolicy = new SimpleRetryPolicy(10, 1000);
 
@@ -51,6 +53,6 @@ public class ClientReconnectHandler extends ChannelInboundHandlerAdapter {
         } else {
             throw new RuntimeException("Failed to reconnect to the server.");
         }
-        ctx.fireChannelInactive();
+//        ctx.fireChannelInactive();
     }
 }

@@ -21,10 +21,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class ChatTest implements InitializingBean {
     @Autowired
-    private NettyServer nettyServer;
+    NettyServer nettyServer;
 
-    @Autowired
-    private NettyClient nettyClient;
+    NettyClient nettyClient = new NettyClient("localhost", 8080);
 
     @Override
     public void afterPropertiesSet() throws Exception {

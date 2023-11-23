@@ -23,8 +23,7 @@ public class HeartBeatTest implements InitializingBean {
     @Autowired
     NettyServer nettyServer;
 
-    @Autowired
-    NettyClient nettyClient;
+    NettyClient nettyClient = new NettyClient("localhost", 8080);
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -43,6 +42,8 @@ public class HeartBeatTest implements InitializingBean {
     @Test
     public void testBasic() throws InterruptedException {
         nettyClient.doConnect();
+        Thread.sleep(500);
+        nettyClient.doLogin();
         Thread.sleep(10000);
     }
 
@@ -64,7 +65,7 @@ public class HeartBeatTest implements InitializingBean {
         // TODO 目前重连测试有问题，需要调整
         nettyClient.doConnect();
         Thread.sleep(500);
-        nettyClient.close();
-        Thread.sleep(5000);
+        nettyClient.closeSession();
+        Thread.sleep(10000);
     }
 }

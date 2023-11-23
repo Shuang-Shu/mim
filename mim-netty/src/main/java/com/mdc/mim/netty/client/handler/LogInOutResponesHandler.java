@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @ChannelHandler.Sharable
-@Component
 public class LogInOutResponesHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

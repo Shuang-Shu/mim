@@ -8,6 +8,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 
 import com.mdc.mim.common.constant.CommonConstant;
+import com.mdc.mim.common.utils.ClassIdUtils;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -35,7 +36,8 @@ public class KryoContentDecoder extends MessageToMessageDecoder<byte[]> {
         try (var ios = new ByteArrayInputStream(msg)) {
             input = new Input(ios);
             int classId = input.readInt(); // 1字节版本ID+3字节全类名Hash
-            var registration = serializerThreadLocal.get().getRegistration(classId);
+            var clazz = ClassIdUtils.getClassById(classId);
+            var registration = serializerThreadLocal.get().getRegistration(clazz);
             if (registration == null) {
                 throw new IllegalStateException("class version is not registered");
             }

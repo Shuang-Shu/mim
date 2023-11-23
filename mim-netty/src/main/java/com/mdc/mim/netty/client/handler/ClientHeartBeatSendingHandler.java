@@ -1,6 +1,7 @@
 package com.mdc.mim.netty.client.handler;
 
 import com.mdc.mim.common.constant.HeartBeatConstant;
+import com.mdc.mim.common.dto.Message;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -18,10 +19,9 @@ import java.util.concurrent.TimeUnit;
  * @date 2023/11/20 19:14
  */
 @Slf4j
-@Component
 @ChannelHandler.Sharable
 public class ClientHeartBeatSendingHandler extends ChannelInboundHandlerAdapter {
-    public static final String HEART_BEAT = "heartBeat";
+    public static final Message HEART_BEAT = Message.builder().build();
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -34,8 +34,8 @@ public class ClientHeartBeatSendingHandler extends ChannelInboundHandlerAdapter 
             @Override
             public void run() {
                 if (ctx.channel().isActive()) {
-                    log.info("sending heartbeat msg: {}", HEART_BEAT);
-                    ctx.writeAndFlush(ctx);
+                    log.debug("sending heartbeat msg");
+                    ctx.channel().writeAndFlush(HEART_BEAT);
                 } else {
                     log.error("server is not active, close this channel");
                     ctx.channel().close();

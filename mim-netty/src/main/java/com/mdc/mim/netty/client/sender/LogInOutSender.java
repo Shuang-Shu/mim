@@ -10,7 +10,6 @@ import io.netty.channel.ChannelFuture;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service("loginSender")
 public class LogInOutSender extends AbstractSender {
     public ChannelFuture sendLogin(UserDTO user) {
         var loginRequest = Message.LoginRequest.buildWith(user, getId());

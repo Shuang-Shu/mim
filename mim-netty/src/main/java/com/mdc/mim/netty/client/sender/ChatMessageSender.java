@@ -9,7 +9,6 @@ import io.netty.channel.ChannelFuture;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service("chatMessageSender")
 public class ChatMessageSender extends AbstractSender {
     /**
      * 发送消息content到toUid
