@@ -1,6 +1,7 @@
 package com.mdc.mim.user;
 
 import java.sql.Date;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,5 +42,13 @@ public class ControllerTest {
         user.setUserName("shuangshu1");
         var r2 = MockMvcTestUtils.mockPerformPost(mvc, session, url, JsonUtils.object2Map(user));
         Assertions.assertEquals(false, r2.get("valid"));
+    }
+
+    @Test
+    void friendControllerTest() throws Exception {
+        var url = "/user/friend/is-friend";
+        var map = Map.of("uid", "1", "friendUid", "3");
+        var r1 = MockMvcTestUtils.mockPerformPost(mvc, session, url, map);
+        Assertions.assertEquals(true, r1.get("isFriend"));
     }
 }

@@ -6,6 +6,7 @@
         values (#{userName}, #{passwdMd5}, #{nickName}, #{registerDate})
     </insert>
 
+
     <insert id="insertUsers" useGeneratedKeys="true" keyProperty="uid" parameterType="UserEntity">insert
         into user (userName, passwdMd5, nickName, registerDate) values
         <foreach
@@ -20,4 +21,11 @@
                  open="(" close=")" separator=",">#{id}
         </foreach>
     </delete>
+
+    <update id="updateUsers">
+        <foreach collection='list' item='user' index='index' open='' separator=';' close=''>
+            update user set userName = #{user.userName}, passwdMd5 = #{user.passwdMd5}, nickName = #{user.nickName},
+            registerDate = #{user.registerDate} where uid = #{user.uid}
+        </foreach>
+    </update>
 </mapper>

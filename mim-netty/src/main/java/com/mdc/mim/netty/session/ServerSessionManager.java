@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServerSessionManager {
     ConcurrentMap<String, ServerSession> sessionMap = new ConcurrentHashMap<>();
+
     public boolean contains(String sessionId) {
         return sessionId != null && sessionMap.containsKey(sessionId);
     }
@@ -33,10 +34,15 @@ public class ServerSessionManager {
     /**
      * 获取user对应的所有会话
      *
-     * @param user
+     * @param uid
      * @return
      */
-    public List<ServerSession> getSessionBy(UserEntity user) {
-        return null;
+    public List<ServerSession> getSessionsByUid(Long uid) {
+        return sessionMap.values().stream().filter(session -> {
+            if (session.getUser() == null || !session.getUser().getUid().equals(uid)) {
+                return false;
+            }
+            return true;
+        }).toList();
     }
 }

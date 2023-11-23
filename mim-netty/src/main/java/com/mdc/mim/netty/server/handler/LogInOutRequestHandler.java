@@ -2,7 +2,7 @@ package com.mdc.mim.netty.server.handler;
 
 import com.mdc.mim.common.concurrent.CallbackExecutor;
 import com.mdc.mim.common.concurrent.CallbackTask;
-import com.mdc.mim.common.constant.MessageTypeEnum;
+import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.dto.Message;
 
 import com.mdc.mim.common.utils.IDUtils;
@@ -84,7 +84,9 @@ public class LogInOutRequestHandler extends ChannelInboundHandlerAdapter {
 
             var serverSession = sessionManager.getSession(message.getSessionId());
             if (serverSession == null) {
-                serverSession = new ServerSession(ctx.channel());
+                // 未登陆过，直接关闭连接
+                ctx.channel().close();
+                return;
             }
             final var session = serverSession;
 

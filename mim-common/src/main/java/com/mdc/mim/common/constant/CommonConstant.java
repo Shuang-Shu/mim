@@ -14,6 +14,9 @@ import com.mdc.mim.common.dto.Message.MessageNotification;
 import com.mdc.mim.common.dto.Message.MessageRequest;
 import com.mdc.mim.common.dto.Message.MessageResponse;
 import com.mdc.mim.common.dto.UserDTO;
+import com.mdc.mim.common.enumeration.MessageTypeEnum;
+import com.mdc.mim.common.enumeration.PlatformEnum;
+import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
 import com.mdc.mim.common.utils.ClassIdUtils;
 
 public class CommonConstant {
@@ -27,7 +30,7 @@ public class CommonConstant {
             LoginRequest.class, LoginResponse.class, LogoutRequest.class,
             LogoutResponse.class,
             KeepAliveRequest.class, KeepAliveResponse.class,
-            MessageRequest.class, MessageResponse.class, MessageNotification.class, Platform.class,
+            MessageRequest.class, MessageResponse.class, MessageNotification.class, PlatformEnum.class,
             ResponsesCodeEnum.class
     };
 

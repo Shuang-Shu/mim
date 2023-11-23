@@ -15,12 +15,12 @@ public class UserEntityServiceImpl implements UserEntityService {
     private UserEntityMapper userEntityMapper;
 
     @Override
-    public List<UserEntity> queryByIds(List<Long> uids) {
+    public List<UserEntity> findByIds(List<Long> uids) {
         return userEntityMapper.findByIds(uids);
     }
 
     @Override
-    public List<UserEntity> queryAll() {
+    public List<UserEntity> findAll() {
         return userEntityMapper.findAll();
     }
 
@@ -40,7 +40,7 @@ public class UserEntityServiceImpl implements UserEntityService {
     }
 
     @Override
-    public UserEntity queryByName(String userName) {
+    public UserEntity findByName(String userName) {
         return userEntityMapper.findByName(userName);
     }
 }

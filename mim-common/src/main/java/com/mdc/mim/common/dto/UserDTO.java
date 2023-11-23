@@ -1,7 +1,7 @@
 package com.mdc.mim.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.mdc.mim.common.constant.Platform;
+import com.mdc.mim.common.enumeration.PlatformEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,5 +25,5 @@ public class UserDTO {
     private String nickName;
     private String devId;
     private String token; // 用于鉴权
-    private Platform platform;
+    private PlatformEnum platformEnum;
 }

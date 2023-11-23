@@ -1,6 +1,6 @@
 package com.mdc.mim.netty.server.processor;
 
-import com.mdc.mim.common.constant.MessageTypeEnum;
+import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.netty.session.ServerSession;
 

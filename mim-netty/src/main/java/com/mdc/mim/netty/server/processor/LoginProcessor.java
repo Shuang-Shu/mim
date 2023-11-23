@@ -1,12 +1,11 @@
 package com.mdc.mim.netty.server.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mdc.mim.common.constant.MessageTypeEnum;
-import com.mdc.mim.common.constant.ResponsesCodeEnum;
+import com.mdc.mim.common.enumeration.MessageTypeEnum;
+import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.dto.UserDTO;
-import com.mdc.mim.common.utils.IDUtils;
-import com.mdc.mim.netty.feign.UserLoginService;
+import com.mdc.mim.netty.feign.UserService;
 import com.mdc.mim.netty.session.ServerSession;
 import com.mdc.mim.netty.session.ServerSessionManager;
 import com.mdc.mim.netty.session.state.StateConstant;
@@ -16,13 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 @Slf4j
 @Component
 public class LoginProcessor implements AbstractProcessor {
     @Autowired
-    private UserLoginService userLoginService;
+    private UserService userService;
     @Autowired
     private ServerSessionManager sessionManager;
 
@@ -41,7 +38,7 @@ public class LoginProcessor implements AbstractProcessor {
         // 1 检查是否已经登录
         if (serverSession.getState().stateDescription().equals(StateConstant.NOT_LOGIN)) {
             var user = loginReq.getUser();
-            var r = userLoginService.identify(user.getUserName(), user.getPasswdMd5());
+            var r = userService.identify(user.getUserName(), user.getPasswdMd5());
             var ok = (Boolean) r.get("valid");
             if (!ok) {
                 loginResp.setCode(ResponsesCodeEnum.FAILED);
@@ -55,6 +52,7 @@ public class LoginProcessor implements AbstractProcessor {
                 result = true;
                 // 修改session状态
                 serverSession.loginSuccess(message);
+                serverSession.setUser(userDto);
             }
         } else {
             // 已登录

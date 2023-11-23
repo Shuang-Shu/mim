@@ -1,11 +1,13 @@
+# spring设置
 spring:
   application:
     name: mim-netty
-
+  main:
+    allow-circular-references: true
 # 日志设置
 logging:
   level:
-    com.mdc.mim: debug
+    com.mdc.mim: info
 
 # mim server配置
 mim:
@@ -14,6 +16,7 @@ mim:
     server:
       host: localhost
       port: 8080
+
   server:
     # 服务端接收端口配置
     host: localhost

@@ -30,9 +30,6 @@ public interface FriendEntityMapper {
     @Delete("DELETE FROM friend WHERE uid = #{uid} AND friendUid = #{friendUid}")
     int deleteByUidAndFriendUid(@Param("uid") Long uid, @Param("friendUid") Long friendUid);
 
-//    @Delete("DELETE FROM friend WHERE uid = #{uid}")
-//    int deleteByUidAndFriendUids(@Param("uid") Long uid, @Param("friendUid") Long friendUid);
-
     int deleteByUids(List<Long> uids);
 
     @Update("UPDATE friend SET friendUid = #{friendUid}, createTime = #{createTime} WHERE uid = #{uid} AND friendUid = #{friendUid}")

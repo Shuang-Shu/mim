@@ -58,6 +58,6 @@ public abstract class AbstractSender {
     }
 
     protected UserDTO getUser() {
-        return ((ClientLoginState) clientSession.getState()).getUser();
+        return clientSession.getUser();
     }
 }

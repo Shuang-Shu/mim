@@ -3,7 +3,7 @@ package com.mdc.mim.netty.client.sender;
 import com.mdc.mim.common.dto.UserDTO;
 import org.springframework.stereotype.Service;
 
-import com.mdc.mim.common.constant.MessageTypeEnum;
+import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.dto.Message;
 
 import io.netty.channel.ChannelFuture;

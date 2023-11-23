@@ -44,8 +44,10 @@ public class ServerHeartBeatTimeoutHandler extends ChannelInboundHandlerAdapter 
             if (state.state() == IdleState.READER_IDLE) {
                 // 超时，主动关闭连接
                 var session = (ServerSession) ctx.channel().attr(AbstractSession.SESSION_KEY).get();
-                log.info("heartbeat timeout, close session: {}", session);
-                session.close();
+                if (session != null) {
+                    log.info("heartbeat timeout, close session: {}", session);
+                    session.close();
+                }
             }
         } else {
             super.userEventTriggered(ctx, evt);

@@ -65,6 +65,8 @@ public class NettyClient {
     private LogInOutSender loginoutSender;
     @Autowired
     private ChatMessageSender chatMessageSender;
+    @Autowired
+    private ClientReconnectHandler clientReconnectHandler;
 
     private UserDTO user;
 
@@ -103,43 +105,52 @@ public class NettyClient {
         }
     };
 
+    public void init(UserDTO user) {
+        // 设置当前client对应的user
+        this.user = user;
+
+        // 初始化bootstrap
+        b = new Bootstrap();
+        b.group(g);
+        b.channel(NioSocketChannel.class); // 客户端使用BIO实现
+        b.option(ChannelOption.SO_KEEPALIVE, true);
+        b.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT); // 设置默认内存分配器
+        b.remoteAddress(host, port);
+
+        // 设置handlers
+        b.handler(
+                new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        // 心跳相关
+                        ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(0, HeartBeatConstant.WRITE_IDLE_TIME, 0, TimeUnit.SECONDS));
+                        ch.pipeline().addLast("heartBeatTrigger", clientHeartbeatTimeoutHandler);
+                        ch.pipeline().addLast("heartBeatPing", clientHeartBeatSendingHandler);
+                        // 解编码
+                        // 入站
+                        ch.pipeline().addLast("mimDecoder", new MIMByteDecoder());
+                        ch.pipeline().addLast("kryoDecoder", new KryoContentDecoder(CommonConstant.supplier));
+                        // 出站
+                        ch.pipeline().addLast("mimEncoder", new MIMByteEncoder());
+                        ch.pipeline().addLast("kryoEncoder", new KryoContentEncoder(CommonConstant.supplier));
+                        // 业务处理
+                        ch.pipeline().addLast("loginReqHandler", loginOutResponesHandler);
+                        // 重连机制
+                        ch.pipeline().addLast("reconnectHandler", clientReconnectHandler);
+                        // 异常处理
+                        ch.pipeline().addLast("exceptionHandler", exceptionHandler);
+                    }
+                });
+
+        log.info("client connecting");
+    }
+
     public ChannelFuture doConnect() {
         if (user == null) {
             log.error("user is not set yet");
+            throw new RuntimeException("user is not set yet");
         }
         try {
-            b = new Bootstrap();
-
-            b.group(g);
-            b.channel(NioSocketChannel.class); // 客户端使用BIO实现
-            b.option(ChannelOption.SO_KEEPALIVE, true);
-            b.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT); // 设置默认内存分配器
-            b.remoteAddress(host, port);
-
-            // 设置handlers
-            b.handler(
-                    new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            // 心跳相关
-                            ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(0, HeartBeatConstant.WRITE_IDLE_TIME, 0, TimeUnit.SECONDS));
-                            ch.pipeline().addLast("heartBeatTrigger", clientHeartbeatTimeoutHandler);
-                            ch.pipeline().addLast("heartBeatPing", clientHeartBeatSendingHandler);
-                            // 解编码
-                            // 入站
-                            ch.pipeline().addLast("mimDecoder", new MIMByteDecoder());
-                            ch.pipeline().addLast("kryoDecoder", new KryoContentDecoder(CommonConstant.supplier));
-                            // 出站
-                            ch.pipeline().addLast("mimEncoder", new MIMByteEncoder());
-                            ch.pipeline().addLast("kryoEncoder", new KryoContentEncoder(CommonConstant.supplier));
-                            // 业务处理
-                            ch.pipeline().addLast("loginReqHandler", loginOutResponesHandler);
-                            // 异常处理
-                            ch.pipeline().addLast("exceptionHandler", exceptionHandler);
-                        }
-                    });
-
-            log.info("client connecting");
             var cf = b.connect();
             cf.addListener(connectedListener); // 添加连接监听器
             return cf;
@@ -188,7 +199,9 @@ public class NettyClient {
 
     public void close() {
         try {
-            clientSession.close();
+            if (clientSession != null) {
+                clientSession.close();
+            }
         } finally {
             g.shutdownGracefully();
         }

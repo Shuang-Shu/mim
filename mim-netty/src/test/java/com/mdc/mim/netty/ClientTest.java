@@ -2,10 +2,10 @@ package com.mdc.mim.netty;
 
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.common.utils.DigestUtils;
-import com.mdc.mim.netty.feign.UserLoginService;
 import com.mdc.mim.netty.session.state.impl.client.ClientLoginState;
 import com.mdc.mim.netty.session.state.impl.client.ClientNotLoginState;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class ClientTest implements InitializingBean {
         t1.start();
         Thread.sleep(500);
         var user = UserDTO.builder().userName("shuangshu").passwdMd5(DigestUtils.md5("12345")).build();
-        nettyClient.setUser(user);
+        nettyClient.init(user);
         nettyClient.doConnect().sync();
     }
 

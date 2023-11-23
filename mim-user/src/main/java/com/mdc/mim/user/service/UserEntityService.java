@@ -8,11 +8,11 @@ import com.mdc.mim.user.entity.UserEntity;
  * 用于查询用户信息
  */
 public interface UserEntityService {
-    UserEntity queryByName(String userName);
+    UserEntity findByName(String userName);
 
-    List<UserEntity> queryByIds(List<Long> uids);
+    List<UserEntity> findByIds(List<Long> uids);
 
-    List<UserEntity> queryAll();
+    List<UserEntity> findAll();
 
     int deleteByName(String userName);
 

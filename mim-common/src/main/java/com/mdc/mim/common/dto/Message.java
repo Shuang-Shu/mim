@@ -1,16 +1,14 @@
 package com.mdc.mim.common.dto;
 
 import com.mdc.mim.common.constant.CommonConstant;
-import com.mdc.mim.common.constant.Platform;
-import com.mdc.mim.common.constant.MessageTypeEnum;
+import com.mdc.mim.common.enumeration.MessageTypeEnum;
 
-import com.mdc.mim.common.constant.ResponsesCodeEnum;
+import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.apache.catalina.User;
 
 @Data
 @Builder
@@ -136,12 +134,25 @@ public class Message {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MessageResponse {
+        public static MessageResponse buildWith(MessageRequest messageRequest) {
+            // 使用所有字段build
+            return MessageResponse.builder().id(messageRequest.getId()).from(messageRequest.getFrom())
+                    .to(messageRequest.getTo()).time(messageRequest.getTime())
+                    .messageType(messageRequest.getMessageType()).content(messageRequest.getContent())
+                    .url(messageRequest.getUrl()).property(messageRequest.getProperty())
+                    .fromNick(messageRequest.getFromNick()).json(messageRequest.getJson()).build();
+        }
+
         long id;
-        int code;
-        String info;
-        int expose;
-        boolean lastBlock; // 是否为最后的应答
-        int blockIndex; // 应答序号
+        Long from;
+        Long to;
+        long time;
+        Message.ChatMessageType messageType;
+        String content;
+        String url;
+        String property;
+        String fromNick;
+        String json;
     }
 
     @Data

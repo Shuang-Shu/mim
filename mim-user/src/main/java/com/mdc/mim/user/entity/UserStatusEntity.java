@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Date;
+
 /**
  * @author ShuangShu
  * @version 1.0
@@ -20,7 +22,7 @@ public class UserStatusEntity {
     // 用户状态：在线(2)、隐身(1)和离线(0)等
     private Integer status;
     // 用户最后一次在线时间
-    private Long lastOnlineTime;
+    private Date lastOnlineTime;
     // 用户是否接收消息通知
     private Boolean doNotify;
 }

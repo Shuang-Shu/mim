@@ -2,10 +2,11 @@ package com.mdc.mim.netty;
 
 import java.io.Serializable;
 
-import com.mdc.mim.common.constant.ResponsesCodeEnum;
 import com.mdc.mim.common.dto.Message;
+import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
 import com.mdc.mim.common.dto.UserDTO;
-import com.mdc.mim.common.utils.DigestUtils;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.mdc.mim.netty.codec.KryoContentDecoder;
@@ -13,7 +14,7 @@ import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
 import com.mdc.mim.netty.codec.MIMByteEncoder;
 import com.mdc.mim.common.constant.CommonConstant;
-import com.mdc.mim.common.constant.Platform;
+import com.mdc.mim.common.enumeration.PlatformEnum;
 import com.mdc.mim.common.dto.Message.LoginRequest;
 import com.mdc.mim.common.dto.Message.LoginResponse;
 import com.mdc.mim.common.dto.Message.LogoutRequest;
@@ -28,29 +29,16 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.embedded.EmbeddedChannel;
 
 public class EndecoderTest {
-    EmbeddedChannel channel;
+    static EmbeddedChannel channel;
 
-    public static class Message implements Serializable {
-        int id;
-        String content;
+    static Message message = Message.builder().sessionId("testSessionId").build();
 
-        public Message() {
-        }
-
-        public Message(int id, String msg) {
-            this.id = id;
-            this.content = msg;
-        }
-
-        @Override
-        public String toString() {
-            return "msg: " + id + ", " + content;
-        }
+    @BeforeAll
+    static void init() {
+        initialChannelWith(channelHandlers);
     }
 
-    static Message message = new Message(6657, "hello world!");
-
-    void initialChannelWith(ChannelHandler[] handlers) {
+    static void initialChannelWith(ChannelHandler[] handlers) {
         var initializer = new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(Channel ch) throws Exception {
@@ -62,7 +50,7 @@ public class EndecoderTest {
         channel = new EmbeddedChannel(initializer);
     }
 
-    static UserDTO userDTO = UserDTO.builder().userName("test").passwdMd5("test").devId("dev-1").platform(Platform.LINUX).build();
+    static UserDTO userDTO = UserDTO.builder().userName("test").passwdMd5("test").devId("dev-1").platformEnum(PlatformEnum.LINUX).build();
 
     static ChannelHandler[] channelHandlers;
 
@@ -96,13 +84,13 @@ public class EndecoderTest {
 
     @Test
     public void testKryoDecoder() {
-        initialChannelWith(channelHandlers);
+//        initialChannelWith(channelHandlers);
         doTestPipeline(channel, message);
     }
 
     @Test
     public void testLoginTransport() {
-        initialChannelWith(channelHandlers);
+//        initialChannelWith(channelHandlers);
         var req = LoginRequest.buildWith(userDTO, 1L);
         doTestPipeline(channel, req);
         var resp = LoginResponse.builder().code(ResponsesCodeEnum.SUCCESS).id(123L).info("success").expose(9).build();
@@ -111,7 +99,7 @@ public class EndecoderTest {
 
     @Test
     public void testLogoutTransport() {
-        initialChannelWith(channelHandlers);
+//        initialChannelWith(channelHandlers);
         var req = LogoutRequest.builder().id(123L).build();
         var resp = LogoutResponse.builder().id(321L).build();
         doTestPipeline(channel, req);
@@ -120,13 +108,12 @@ public class EndecoderTest {
 
     @Test
     public void testMessageTransport() {
-        initialChannelWith(channelHandlers);
+//        initialChannelWith(channelHandlers);
         var req = MessageRequest.builder().id(123L).from(1234L).to(12345L).time(System.currentTimeMillis())
                 .messageType(com.mdc.mim.common.dto.Message.ChatMessageType.TEXT).content("hello world")
                 .url("mimprotocol").property("").fromNick("shuangshu-nick")
                 .json("{\"hello\": \"good\" }").build();
-        var resp = MessageResponse.builder().id(321L).code(2).info("good").expose(3).lastBlock(false).blockIndex(3)
-                .build();
+        var resp = MessageResponse.builder().id(321L).build();
         doTestPipeline(channel, req);
         doTestPipeline(channel, resp);
     }

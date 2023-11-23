@@ -1,8 +1,8 @@
 package com.mdc.mim.netty;
 
 import com.mdc.mim.common.utils.DigestUtils;
-import com.mdc.mim.netty.feign.UserLoginService;
-import org.bouncycastle.crypto.Digest;
+import com.mdc.mim.netty.feign.FriendService;
+import com.mdc.mim.netty.feign.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +17,29 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class FeignTest {
     @Autowired
-    private UserLoginService userLoginService;
+    private UserService userService;
+
+    @Autowired
+    private FriendService friendService;
 
     @Test
     public void basicTest() {
-        Assertions.assertNotNull(userLoginService);
+        Assertions.assertNotNull(userService);
     }
 
     @Test
-    public void feignRpcTest() {
-        var r = userLoginService.identify("shuangshu", DigestUtils.md5("12345"));
+    public void testUserService() {
+        var r = userService.identify("shuangshu", DigestUtils.md5("12345"));
         Assertions.assertEquals(true, r.get("valid"));
-        r = userLoginService.identify("shuangshu1", DigestUtils.md5("12345"));
+        r = userService.identify("shuangshu1", DigestUtils.md5("12345"));
         Assertions.assertEquals(false, r.get("valid"));
+        r = userService.findUidByUserName("shuangshu");
+        Assertions.assertEquals(1L, Long.valueOf((Integer) r.get("uid")));
+    }
+
+    @Test
+    public void testFriendService() {
+//        userService.isFriend(1L, 2L);
+        friendService.isFriend(1L, 2L);
     }
 }

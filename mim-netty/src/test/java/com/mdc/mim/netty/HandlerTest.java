@@ -9,8 +9,8 @@ import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
 import com.mdc.mim.netty.codec.MIMByteEncoder;
 import com.mdc.mim.common.constant.CommonConstant;
-import com.mdc.mim.common.constant.MessageTypeEnum;
-import com.mdc.mim.common.constant.Platform;
+import com.mdc.mim.common.enumeration.MessageTypeEnum;
+import com.mdc.mim.common.enumeration.PlatformEnum;
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.netty.server.handler.LogInOutRequestHandler;
 
@@ -23,7 +23,7 @@ import io.netty.channel.embedded.EmbeddedChannel;
 public class HandlerTest {
     static ChannelHandler[] channelHandlers;
 
-    static UserDTO userDTO = UserDTO.builder().userName("test").passwdMd5("test").devId("dev-1").platform(Platform.LINUX).build();
+    static UserDTO userDTO = UserDTO.builder().userName("test").passwdMd5("test").devId("dev-1").platformEnum(PlatformEnum.LINUX).build();
 
     static Message.LoginRequest loginReq = Message.LoginRequest.buildWith(userDTO, 1L);
 

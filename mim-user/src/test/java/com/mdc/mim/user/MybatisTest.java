@@ -2,6 +2,8 @@ package com.mdc.mim.user;
 
 import java.sql.Date;
 
+import com.mdc.mim.common.constant.UserStatusEnum;
+import com.mdc.mim.user.entity.UserStatusEntity;
 import com.mdc.mim.user.mapper.FriendEntityMapper;
 import com.mdc.mim.user.mapper.UserStatusMapper;
 import org.junit.jupiter.api.Assertions;
@@ -20,7 +22,6 @@ public class MybatisTest {
     /**
      * 数据库内容与`duumy_data/insert_user.sql`应相同
      */
-
     @Autowired
     private UserLoginMapper userLoginMapper;
     @Autowired
@@ -72,7 +73,29 @@ public class MybatisTest {
         Assertions.assertEquals(4, users.size());
     }
 
+    @Test
+    public void testBasicUserStatus() {
+        var ret = userStatusMapper.findAll();
+        Assertions.assertEquals(0, ret.size());
+    }
+
     // userStatus相关测试
+    @Test
+    public void testUserStatusMapper() {
+        var userStatus = UserStatusEntity.builder().status(UserStatusEnum.ONLINE).uid(1L).lastOnlineTime(new Date(System.currentTimeMillis())).build();
+        var ret = userStatusMapper.insertUserStatus(userStatus);
+        Assertions.assertEquals(1, ret);
+        userStatus = userStatusMapper.findByUid(1L);
+        Assertions.assertEquals(UserStatusEnum.ONLINE, userStatus.getStatus());
+        userStatus.setStatus(UserStatusEnum.OFFLINE);
+        ret = userStatusMapper.updateUserStatus(userStatus);
+        Assertions.assertEquals(1, ret);
+        userStatus = userStatusMapper.findByUid(1L);
+        Assertions.assertEquals(UserStatusEnum.OFFLINE, userStatus.getStatus());
+        ret = userStatusMapper.deleteByUid(1L);
+        Assertions.assertEquals(1, ret);
+    }
+
     // friend相关测试
     @Test
     public void testBasicFriends() {

@@ -28,3 +28,8 @@ nacos:
     auto-register: true
     register:
       groupName: MIM
+
+# log配置
+logging:
+  level:
+    com.lucifer.springboot.cache.mapper: debug

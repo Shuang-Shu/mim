@@ -1,5 +1,6 @@
 package com.mdc.mim.netty.session;
 
+import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.netty.session.state.ISessionState;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -22,6 +23,7 @@ public abstract class AbstractSession {
     protected Channel channel;
     protected ISessionState state;
     protected String sessionId;
+    protected UserDTO user;
 
     public void bindChannel(Channel channel) {
         channel.attr(SESSION_KEY).set(this);
@@ -36,22 +38,13 @@ public abstract class AbstractSession {
         cf.addListener(ChannelFutureListener.CLOSE); // 添加关闭Listener
     }
 
-    public final void setState(ISessionState state) {
-        this.state = state;
-    }
-
-    public final ISessionState getState() {
-        return state;
-    }
-
     public void close() {
-        // TODO 更新Session状态
         var cf = channel.close();
         cf.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (cf.isSuccess()) {
-                    log.info("has closed session: {}", future.channel().attr(AbstractSession.SESSION_KEY).get());
+                    log.info("has closed session in channel: {}", channel);
                 }
             }
         });

@@ -1,7 +1,7 @@
 package com.mdc.mim.netty.server.processor;
 
-import com.mdc.mim.common.constant.MessageTypeEnum;
-import com.mdc.mim.common.constant.ResponsesCodeEnum;
+import com.mdc.mim.common.enumeration.MessageTypeEnum;
+import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.netty.session.ServerSession;
 import com.mdc.mim.netty.session.ServerSessionManager;
@@ -31,21 +31,16 @@ public class LogoutProcessor implements AbstractProcessor {
         var logoutReq = message.getLogoutRequest();
         var logoutResp = Message.LogoutResponse.builder().id(logoutReq.getId()).build();
         var respMessage = Message.builder().messageType(MessageTypeEnum.LOGOUT_RESP).logoutResponse(logoutResp).build();
-        if (sessionManager.contains(message.getSessionId())) {
-            sessionManager.removeSession(message.getSessionId());
-            logoutResp.setCode(ResponsesCodeEnum.SUCCESS);
-            // 发送消息
-            try {
-                serverSession.writeAndFlush(respMessage).sync();
-                serverSession.logoutSuccess(message);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return true;
-        } else {
-            logoutResp.setCode(ResponsesCodeEnum.FAILED);
-            logoutResp.setInfo("user: " + logoutReq.getUser().getUserName() + " is not login");
+        sessionManager.removeSession(message.getSessionId());
+        logoutResp.setCode(ResponsesCodeEnum.SUCCESS);
+        // 发送消息
+        try {
+            serverSession.writeAndFlush(respMessage).sync();
+            serverSession.logoutSuccess(message);
+            serverSession.setUser(null);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return false;
+        return true;
     }
 }

@@ -57,8 +57,8 @@ public class NettyServer {
         try {
             b.group(bossLoopGroup, workerLoopGroup);
             b.channel(NioServerSocketChannel.class);
-            b.option(ChannelOption.SO_KEEPALIVE, true);
-            b.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
+            b.childOption(ChannelOption.SO_KEEPALIVE, true);
+            b.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
             b.childHandler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {

@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @description: TODO
  * @date 2023/11/13 22:12
  */
-@FeignClient("mim-user")
-public interface UserLoginService {
+@FeignClient(value = "mim-user", contextId = "user-service")
+public interface UserService {
     @PostMapping("/user/identify")
     public R identify(@RequestParam("userName") String userName, @RequestParam("passwdMd5") String passwdMd5);
+
+    @PostMapping("/user/find-uid")
+    public R findUidByUserName(@RequestParam("userName") String userName);
 }

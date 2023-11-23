@@ -1,6 +1,9 @@
 package com.mdc.mim.user.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -11,6 +14,9 @@ import java.util.Date;
  * @date 2023/11/21 21:53
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class FriendEntity {
     private Long uid;
     private Long friendUid;
