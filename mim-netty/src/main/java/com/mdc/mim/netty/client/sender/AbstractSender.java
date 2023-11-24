@@ -49,8 +49,7 @@ public abstract class AbstractSender {
     }
 
     protected void sendSucceed(Object msg) {
-        log.info("successfully sending message");
-        log.debug("successfully sending message: {}", msg);
+        log.info("successfully sending message {}", msg);
     }
 
     protected void sendFailed(Object msg) {

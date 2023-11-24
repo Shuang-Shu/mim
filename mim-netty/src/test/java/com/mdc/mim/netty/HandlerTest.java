@@ -25,7 +25,7 @@ public class HandlerTest {
 
     static UserDTO userDTO = UserDTO.builder().userName("test").passwdMd5("test").devId("dev-1").platformEnum(PlatformEnum.LINUX).build();
 
-    static Message.LoginRequest loginReq = Message.LoginRequest.buildWith(userDTO, 1L);
+    static Message.LogInRequest loginReq = Message.LogInRequest.buildWith(userDTO, 1L);
 
     static Kryo kryo = CommonConstant.supplier.get();
 
@@ -52,7 +52,7 @@ public class HandlerTest {
                         ch.pipeline().addLast(new LogInOutRequestHandler());
                     }
                 });
-        var message = Message.builder().loginRequest(loginReq).messageType(MessageTypeEnum.LOGIN_REQ).build();
+        var message = Message.builder().logInRequest(loginReq).messageType(MessageTypeEnum.LOGIN_REQ).build();
         channel.writeOutbound(message);
         var buf = ((ByteBuf) channel.readOutbound()).slice();
         channel.writeInbound(buf); // 将请求写入服务器

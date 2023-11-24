@@ -6,10 +6,9 @@ import com.esotericsoftware.kryo.Kryo;
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.dto.Message.KeepAliveRequest;
 import com.mdc.mim.common.dto.Message.KeepAliveResponse;
-import com.mdc.mim.common.dto.Message.LoginRequest;
-import com.mdc.mim.common.dto.Message.LoginResponse;
-import com.mdc.mim.common.dto.Message.LogoutRequest;
-import com.mdc.mim.common.dto.Message.LogoutResponse;
+import com.mdc.mim.common.dto.Message.LogInResponse;
+import com.mdc.mim.common.dto.Message.LogOutRequest;
+import com.mdc.mim.common.dto.Message.LogOutResponse;
 import com.mdc.mim.common.dto.Message.MessageNotification;
 import com.mdc.mim.common.dto.Message.MessageRequest;
 import com.mdc.mim.common.dto.Message.MessageResponse;
@@ -27,8 +26,8 @@ public class CommonConstant {
 
     private static final Class<?>[] messageClasses = {
             String.class, Message.class, Message.ChatMessageType.class, MessageTypeEnum.class, ResponsesCodeEnum.class, UserDTO.class,
-            LoginRequest.class, LoginResponse.class, LogoutRequest.class,
-            LogoutResponse.class,
+            Message.LogInRequest.class, LogInResponse.class, LogOutRequest.class,
+            LogOutResponse.class,
             KeepAliveRequest.class, KeepAliveResponse.class,
             MessageRequest.class, MessageResponse.class, MessageNotification.class, PlatformEnum.class,
             ResponsesCodeEnum.class

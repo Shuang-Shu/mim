@@ -2,6 +2,7 @@ package com.mdc.mim.netty;
 
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.common.utils.DigestUtils;
+import com.mdc.mim.netty.session.state.StateConstant;
 import com.mdc.mim.netty.session.state.impl.client.ClientLoginState;
 import com.mdc.mim.netty.session.state.impl.client.ClientNotLoginState;
 import org.junit.jupiter.api.Assertions;
@@ -51,14 +52,14 @@ public class ClientTest implements InitializingBean {
     }
 
     public void testSingleLoginOut() throws InterruptedException {
-        Assertions.assertEquals(true, nettyClient.getClientSession().getState() instanceof ClientNotLoginState);
+        Assertions.assertEquals(true, nettyClient.getClientSession().getState().stateDescription().equals(StateConstant.NOT_LOGIN));
         // 测试客户端登录功能
         nettyClient.doLogin().sync();
         Thread.sleep(200);
-        Assertions.assertEquals(true, nettyClient.getClientSession().getState() instanceof ClientLoginState);
+        Assertions.assertEquals(true, nettyClient.getClientSession().getState().stateDescription().equals(StateConstant.LOGIN));
         nettyClient.doLogout().sync();
         Thread.sleep(200);
-        Assertions.assertEquals(true, nettyClient.getClientSession().getState() instanceof ClientNotLoginState);
+        Assertions.assertEquals(true, nettyClient.getClientSession().getState().stateDescription().equals(StateConstant.NOT_LOGIN));
     }
 
     @Test
@@ -77,6 +78,6 @@ public class ClientTest implements InitializingBean {
     public void testSending() throws InterruptedException {
         nettyClient.doLogin().sync();
         Thread.sleep(500);
-        nettyClient.doSend(12345L, "test_content");
+        nettyClient.doSend(3L, "test_content");
     }
 }

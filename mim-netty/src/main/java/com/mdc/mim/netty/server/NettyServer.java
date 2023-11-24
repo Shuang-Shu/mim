@@ -42,6 +42,8 @@ public class NettyServer {
     @Autowired
     private ChatMessageRedirectHandler chatMessageRedirectHandler;
     @Autowired
+    private LogInRequestHandler logInRequestHandler;
+    @Autowired
     private LogInOutRequestHandler loginOutRequestHandler;
     @Autowired
     private ServerExceptionHandler serverExceptionHandler;
@@ -73,10 +75,12 @@ public class NettyServer {
                     ch.pipeline().addLast(new MIMByteEncoder());
                     ch.pipeline().addLast(new KryoContentEncoder(CommonConstant.supplier));
                     // handlers
-                    ch.pipeline().addLast(loginOutRequestHandler);
-                    ch.pipeline().addLast(chatMessageRedirectHandler);
-                    // exception
-                    ch.pipeline().addLast(serverExceptionHandler);
+                    ch.pipeline().addLast(MessageFormatFilter.NAME, new MessageFormatFilter()); // 过滤格式不正确的消息
+                    ch.pipeline().addLast(LogInRequestHandler.NAME, logInRequestHandler); // 登入处理器
+//                    ch.pipeline().addLast(loginOutRequestHandler);
+                    ch.pipeline().addLast(ChatMessageRedirectHandler.NAME, chatMessageRedirectHandler);
+                    // exception处理
+                    ch.pipeline().addLast(ServerExceptionHandler.NAME, serverExceptionHandler);
                 }
             });
             var channelFuture = b.bind(this.host, this.port).sync();

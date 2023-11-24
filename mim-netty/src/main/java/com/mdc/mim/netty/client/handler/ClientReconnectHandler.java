@@ -33,9 +33,11 @@ public class ClientReconnectHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.info("successfully reconnect server: {}", ctx.channel());
-        retryPolicy.resetCount();
-        super.channelActive(ctx);
+        if (retryPolicy.getCurrentRetryCount() > 0) {
+            log.info("successfully reconnect to server");
+            retryPolicy.resetCount();
+            super.channelActive(ctx);
+        }
     }
 
     @Override
@@ -53,6 +55,5 @@ public class ClientReconnectHandler extends ChannelInboundHandlerAdapter {
         } else {
             throw new RuntimeException("Failed to reconnect to the server.");
         }
-//        ctx.fireChannelInactive();
     }
 }

@@ -2,8 +2,6 @@ package com.mdc.mim.netty.session;
 
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.netty.session.state.IServerSessionState;
-import com.mdc.mim.netty.session.state.ISessionState;
-import com.mdc.mim.netty.session.state.impl.client.ClientNotLoginState;
 import com.mdc.mim.netty.session.state.impl.server.ServerNotLoginState;
 import io.netty.channel.Channel;
 import lombok.Data;
@@ -24,13 +22,13 @@ public class ServerSession extends AbstractSession implements IServerSessionStat
     }
 
     @Override
-    public void loginSuccess(Message message) {
-        state.loginSuccess(message);
+    public void logInSuccess(Message message) {
+        state.logInSuccess(message);
     }
 
     @Override
-    public void logoutSuccess(Message message) {
-        state.logoutSuccess(message);
+    public void logOutSuccess(Message message) {
+        state.logOutSuccess(message);
     }
 
     @Override

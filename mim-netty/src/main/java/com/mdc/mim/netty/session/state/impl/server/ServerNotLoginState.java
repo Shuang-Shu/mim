@@ -17,9 +17,9 @@ public class ServerNotLoginState extends AbstractServerSessionState {
     }
 
     @Override
-    public void loginSuccess(Message message) {
+    public void logInSuccess(Message message) {
         var newState = new ServerLoginState(this.session);
-        newState.setUser(message.getLoginRequest().getUser());
+        newState.setUser(message.getLogInRequest().getUser());
         this.session.setState(newState);
     }
 

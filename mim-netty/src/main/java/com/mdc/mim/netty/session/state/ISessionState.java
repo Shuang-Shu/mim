@@ -9,9 +9,9 @@ import com.mdc.mim.common.dto.Message;
  * @date 2023/11/21 11:41
  */
 public interface ISessionState {
-    void loginSuccess(Message message);
+    void logInSuccess(Message message);
 
-    void logoutSuccess(Message message);
+    void logOutSuccess(Message message);
 
     String stateDescription();
 }

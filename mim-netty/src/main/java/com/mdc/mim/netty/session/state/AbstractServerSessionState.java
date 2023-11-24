@@ -13,12 +13,12 @@ public abstract class AbstractServerSessionState implements ISessionState {
     protected AbstractSession session;
 
     @Override
-    public void loginSuccess(Message message) {
+    public void logInSuccess(Message message) {
         // do nothing
     }
 
     @Override
-    public void logoutSuccess(Message message) {
+    public void logOutSuccess(Message message) {
         // do nothing
     }
 

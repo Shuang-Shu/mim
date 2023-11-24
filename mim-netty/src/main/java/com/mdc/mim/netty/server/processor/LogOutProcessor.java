@@ -3,6 +3,8 @@ package com.mdc.mim.netty.server.processor;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
 import com.mdc.mim.common.dto.Message;
+import com.mdc.mim.netty.server.handler.LogInRequestHandler;
+import com.mdc.mim.netty.server.handler.LogOutRequestHandler;
 import com.mdc.mim.netty.session.ServerSession;
 import com.mdc.mim.netty.session.ServerSessionManager;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +19,12 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class LogoutProcessor implements AbstractProcessor {
+public class LogOutProcessor implements AbstractProcessor {
     @Autowired
     private ServerSessionManager sessionManager;
+
+    @Autowired
+    private LogInRequestHandler logInRequestHandler;
 
     @Override
     public MessageTypeEnum supportType() {
@@ -28,16 +33,22 @@ public class LogoutProcessor implements AbstractProcessor {
 
     @Override
     public Boolean process(ServerSession serverSession, Message message) {
-        var logoutReq = message.getLogoutRequest();
-        var logoutResp = Message.LogoutResponse.builder().id(logoutReq.getId()).build();
-        var respMessage = Message.builder().messageType(MessageTypeEnum.LOGOUT_RESP).logoutResponse(logoutResp).build();
+        var logoutReq = message.getLogOutRequest();
+        var logoutResp = Message.LogOutResponse.builder().id(logoutReq.getId()).build();
+        var respMessage = Message.builder().messageType(MessageTypeEnum.LOGOUT_RESP).logOutResponse(logoutResp).build();
         sessionManager.removeSession(message.getSessionId());
         logoutResp.setCode(ResponsesCodeEnum.SUCCESS);
         // 发送消息
         try {
             serverSession.writeAndFlush(respMessage).sync();
-            serverSession.logoutSuccess(message);
+            serverSession.logOutSuccess(message);
+            // 将serverSession从SessionManager中移除
+            sessionManager.removeSession(serverSession.getSessionId());
             serverSession.setUser(null);
+            // 重新添加LogInRequestHandler
+            var pipeline = serverSession.getChannel().pipeline();
+            pipeline.addBefore(LogOutRequestHandler.NAME, LogInRequestHandler.NAME, logInRequestHandler);
+            pipeline.remove(LogOutRequestHandler.NAME);
         } catch (Exception e) {
             e.printStackTrace();
         }

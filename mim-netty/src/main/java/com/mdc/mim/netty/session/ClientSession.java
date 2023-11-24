@@ -1,12 +1,10 @@
 package com.mdc.mim.netty.session;
 
 import com.mdc.mim.common.dto.Message;
-import com.mdc.mim.common.dto.UserDTO;
 
 import com.mdc.mim.netty.session.state.IClientSessionState;
 import com.mdc.mim.netty.session.state.impl.client.ClientNotLoginState;
 import io.netty.channel.Channel;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -28,14 +26,14 @@ public class ClientSession extends AbstractSession implements IClientSessionStat
         this.bindChannel(channel);
     }
 
-    public void loginSuccess(Message message) {
-        this.sessionId = message.getLoginResponse().getSessionId(); // 获取sessionId
-        state.logoutSuccess(message);
+    public void logInSuccess(Message message) {
+        this.sessionId = message.getLogInResponse().getSessionId(); // 获取sessionId
+        state.logOutSuccess(message);
     }
 
     @Override
-    public void logoutSuccess(Message message) {
-        state.logoutSuccess(message);
+    public void logOutSuccess(Message message) {
+        state.logOutSuccess(message);
     }
 
     @Override

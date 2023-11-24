@@ -18,13 +18,14 @@ import lombok.experimental.Accessors;
 public class Message {
     MessageTypeEnum messageType; // 消息类型
     String sessionId; // 请求中携带的sessionId
+    String info; // 响应中携带的信息
 
     // 登入
-    LoginRequest loginRequest;
-    LoginResponse loginResponse;
+    LogInRequest logInRequest;
+    LogInResponse logInResponse;
     // 登出
-    LogoutRequest logoutRequest;
-    LogoutResponse logoutResponse;
+    LogOutRequest logOutRequest;
+    LogOutResponse logOutResponse;
     // keep-alive
     KeepAliveRequest keepAliveRequest;
     KeepAliveResponse keepAliveResponse;
@@ -43,9 +44,9 @@ public class Message {
     @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class LoginRequest {
-        public static LoginRequest buildWith(UserDTO user, long messageId) {
-            return LoginRequest.builder().user(user).id(messageId).appVersion(CommonConstant.APP_VERSION).build();
+    public static class LogInRequest {
+        public static LogInRequest buildWith(UserDTO user, long messageId) {
+            return LogInRequest.builder().user(user).id(messageId).appVersion(CommonConstant.APP_VERSION).build();
         }
 
         UserDTO user;
@@ -58,7 +59,7 @@ public class Message {
     @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class LoginResponse {
+    public static class LogInResponse {
         long id;
         ResponsesCodeEnum code;
         UserDTO user;
@@ -72,9 +73,9 @@ public class Message {
     @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class LogoutRequest {
-        public static LogoutRequest buildWith(UserDTO user, long messageId) {
-            return LogoutRequest.builder().user(user).id(messageId).build();
+    public static class LogOutRequest {
+        public static LogOutRequest buildWith(UserDTO user, long messageId) {
+            return LogOutRequest.builder().user(user).id(messageId).build();
         }
 
         UserDTO user;
@@ -86,7 +87,7 @@ public class Message {
     @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class LogoutResponse {
+    public static class LogOutResponse {
         long id;
         String info;
         ResponsesCodeEnum code;

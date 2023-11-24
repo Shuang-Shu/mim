@@ -23,9 +23,9 @@ public class ClientNotLoginState extends AbstractClientSessionState {
     }
 
     @Override
-    public void loginSuccess(Message message) {
+    public void logInSuccess(Message message) {
         var newState = new ClientLoginState(this.session);
-        newState.setUser(message.getLoginResponse().getUser());
+        newState.setUser(message.getLogInResponse().getUser());
         session.setState(newState);
     }
 

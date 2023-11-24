@@ -9,9 +9,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @ChannelHandler.Sharable
 public class ClientExceptionHandler extends ChannelInboundHandlerAdapter {
+    public static final String NAME = "clientExceptionHandler";
+
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.error(cause.getMessage());
         cause.printStackTrace();
+        super.exceptionCaught(ctx, cause);
     }
 }

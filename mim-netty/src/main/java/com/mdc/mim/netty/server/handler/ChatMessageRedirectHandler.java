@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ChannelHandler.Sharable
 public class ChatMessageRedirectHandler extends ChannelInboundHandlerAdapter {
+    public static final String NAME = "chatMessageRedirectHandler";
 
     @Autowired
     private ServerSessionManager sessionManager;

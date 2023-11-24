@@ -11,7 +11,9 @@ import com.mdc.mim.netty.client.sender.LogInOutSender;
 import com.mdc.mim.netty.codec.KryoContentDecoder;
 import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
+import com.mdc.mim.netty.server.handler.MessageFormatFilter;
 import com.mdc.mim.netty.session.ClientSession;
+import com.mdc.mim.netty.session.state.StateConstant;
 import com.mdc.mim.netty.session.state.impl.client.ClientLoginState;
 import com.mdc.mim.netty.session.state.impl.client.ClientNotConnectState;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -83,7 +85,7 @@ public class NettyClient {
                     TimeUnit.SECONDS);
         } else {
             // 连接成功，创建ClientSession
-            log.info("Successfully connected IM server!");
+            log.info("successfully connected IM server!");
             var channel = f.channel();
             // 创建会话
             clientSession = new ClientSession(channel);
@@ -113,22 +115,23 @@ public class NettyClient {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
                         // 重连机制
-                        ch.pipeline().addLast("reconnectHandler", new ClientReconnectHandler(NettyClient.this));
+                        ch.pipeline().addLast(new ClientReconnectHandler(NettyClient.this));
                         // 心跳相关
-                        ch.pipeline().addLast("idleStateHandler", new IdleStateHandler(0, HeartBeatConstant.WRITE_IDLE_TIME, 0, TimeUnit.SECONDS));
-                        ch.pipeline().addLast("heartBeatTrigger", new ClientHeartBeatTimeoutHandler());
-                        ch.pipeline().addLast("heartBeatPing", new ClientHeartBeatSendingHandler());
+                        ch.pipeline().addLast(new IdleStateHandler(0, HeartBeatConstant.WRITE_IDLE_TIME, 0, TimeUnit.SECONDS));
+                        ch.pipeline().addLast(new ClientHeartBeatTimeoutHandler());
+                        ch.pipeline().addLast(new ClientHeartBeatSendingHandler());
                         // 解编码
                         // 入站
-                        ch.pipeline().addLast("mimDecoder", new MIMByteDecoder());
-                        ch.pipeline().addLast("kryoDecoder", new KryoContentDecoder(CommonConstant.supplier));
+                        ch.pipeline().addLast(new MIMByteDecoder());
+                        ch.pipeline().addLast(new KryoContentDecoder(CommonConstant.supplier));
                         // 出站
-                        ch.pipeline().addLast("mimEncoder", new MIMByteEncoder());
-                        ch.pipeline().addLast("kryoEncoder", new KryoContentEncoder(CommonConstant.supplier));
+                        ch.pipeline().addLast(new MIMByteEncoder());
+                        ch.pipeline().addLast(new KryoContentEncoder(CommonConstant.supplier));
                         // 业务处理
-                        ch.pipeline().addLast("loginReqHandler", new LogInOutResponesHandler());
-                        // 异常处理
-                        ch.pipeline().addLast("exceptionHandler", new ClientExceptionHandler());
+                        ch.pipeline().addLast(MessageFormatFilter.NAME, new MessageFormatFilter()); // 过滤格式不正确的消息
+                        ch.pipeline().addLast(LogInOutResponesHandler.NAME, new LogInOutResponesHandler());
+                        // exception处理
+                        ch.pipeline().addLast(ClientExceptionHandler.NAME, new ClientExceptionHandler());
                     }
                 });
 
@@ -154,8 +157,8 @@ public class NettyClient {
      * 发送登录消息
      */
     public ChannelFuture doLogin() {
-        if (clientSession == null || !(clientSession.getState() instanceof ClientLoginState)) {
-            log.error("has not login yet");
+        if (clientSession == null || clientSession.getState().stateDescription().equals(StateConstant.NOT_CONNECT)) {
+            log.error("not connected yet");
         }
         return loginoutSender.sendLogin(user);
     }

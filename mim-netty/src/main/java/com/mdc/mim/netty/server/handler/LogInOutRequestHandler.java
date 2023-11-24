@@ -6,7 +6,7 @@ import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.dto.Message;
 
 import com.mdc.mim.common.utils.IDUtils;
-import com.mdc.mim.netty.server.processor.LogoutProcessor;
+import com.mdc.mim.netty.server.processor.LogOutProcessor;
 import com.mdc.mim.netty.session.ServerSession;
 import com.mdc.mim.netty.session.ServerSessionManager;
 import io.netty.channel.ChannelHandler;
@@ -15,7 +15,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.mdc.mim.netty.server.processor.LoginProcessor;
+import com.mdc.mim.netty.server.processor.LogInProcessor;
 
 @Slf4j
 @Component
@@ -25,10 +25,10 @@ public class LogInOutRequestHandler extends ChannelInboundHandlerAdapter {
     private ServerSessionManager sessionManager;
 
     @Autowired
-    private LoginProcessor loginProcessor;
+    private LogInProcessor loginProcessor;
 
     @Autowired
-    private LogoutProcessor logoutProcessor;
+    private LogOutProcessor logoutProcessor;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -40,7 +40,7 @@ public class LogInOutRequestHandler extends ChannelInboundHandlerAdapter {
         if (message.getMessageType() == null) {
             return;
         }
-        // 0 判断消息是否为Message.LoginRequest
+        // 0 判断消息是否为Message.LogInRequest
         if (message.getMessageType() == null || !message.getMessageType().equals(MessageTypeEnum.LOGIN_REQ) && !message.getMessageType().equals(MessageTypeEnum.LOGOUT_REQ)) {
             super.channelRead(ctx, msg);
             return;
