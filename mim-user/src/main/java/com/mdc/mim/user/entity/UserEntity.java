@@ -1,5 +1,6 @@
 package com.mdc.mim.user.entity;
 
+import java.io.Serializable;
 import java.sql.Date;
 
 import com.mdc.mim.common.dto.UserDTO;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity {
+public class UserEntity implements Serializable {
     // 持久化属性
     private Long uid;
     private String userName;

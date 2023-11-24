@@ -1,6 +1,7 @@
 package com.mdc.mim.netty;
 
 import com.mdc.mim.common.dto.UserDTO;
+import com.mdc.mim.netty.server.handler.LogInRequestHandler;
 import org.junit.jupiter.api.Test;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -12,7 +13,6 @@ import com.mdc.mim.common.constant.CommonConstant;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.enumeration.PlatformEnum;
 import com.mdc.mim.common.dto.Message;
-import com.mdc.mim.netty.server.handler.LogInOutRequestHandler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -49,7 +49,7 @@ public class HandlerTest {
                         for (var handler : channelHandlers) {
                             ch.pipeline().addLast(handler);
                         }
-                        ch.pipeline().addLast(new LogInOutRequestHandler());
+                        ch.pipeline().addLast(new LogInRequestHandler());
                     }
                 });
         var message = Message.builder().logInRequest(loginReq).messageType(MessageTypeEnum.LOGIN_REQ).build();

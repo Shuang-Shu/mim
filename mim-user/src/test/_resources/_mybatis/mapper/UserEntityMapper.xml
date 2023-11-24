@@ -16,6 +16,13 @@
         </foreach>
     </insert>
 
+    <delete id="deleteByNames">
+        delete from user where userName in
+        <foreach collection="list" item="name"
+                 open="(" close=")" separator=",">#{name}
+        </foreach>
+    </delete>
+
     <delete id="deleteByIds">delete from user where uid in
         <foreach collection="list" item="id"
                  open="(" close=")" separator=",">#{id}

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.sql.Date;
 
 /**
@@ -17,7 +18,7 @@ import java.sql.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserStatusEntity {
+public class UserStatusEntity implements Serializable {
     private Long uid;
     // 用户状态：在线(2)、隐身(1)和离线(0)等
     private Integer status;

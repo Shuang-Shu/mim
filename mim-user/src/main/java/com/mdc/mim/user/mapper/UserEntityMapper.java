@@ -20,13 +20,11 @@ public interface UserEntityMapper {
     public int insertUsers(List<UserEntity> users);
 
     // 查找使用 findBy+属性名(s)
-    @Select("select * from user where uid = #{uid}")
-    public List<UserEntity> findByIds(List<Long> uids);
+    public List<UserEntity> findByUids(List<Long> uids);
 
     @Select("select * from user where userName = #{userName}")
     public UserEntity findByName(String userName);
 
-    @Select("select * from user where userName in (#{userNames})")
     public List<UserEntity> findByNames(List<String> userNames);
 
     // 无条件查找使用findAll
@@ -39,7 +37,6 @@ public interface UserEntityMapper {
     @Delete("delete from user where userName = #{userName}")
     public int deleteByName(String userName);
 
-    @Delete("delete from user where userName in (#{userNames})")
     public int deleteByNames(List<String> userNames);
 
     // 更新使用update+实体类名(s)

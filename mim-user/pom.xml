@@ -19,9 +19,34 @@
         <mybatis.starter.version>2.2.2</mybatis.starter.version>
         <pagehelper.version>1.4.1</pagehelper.version>
         <openfeign.version>4.0.4</openfeign.version>
+        <mim.version>1.0-SNAPSHOT</mim.version>
     </properties>
 
     <dependencies>
+        <!--    redis缓存相关    -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.lettuce</groupId>
+                    <artifactId>lettuce-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+        <!--    nacos相关    -->
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
@@ -29,7 +54,7 @@
         <dependency>
             <groupId>com.mdc.mim</groupId>
             <artifactId>mim-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${mim.version}</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>

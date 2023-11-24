@@ -3,6 +3,7 @@ package com.mdc.mim.user.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import com.mdc.mim.user.entity.UserEntity;
@@ -15,8 +16,8 @@ public class UserEntityServiceImpl implements UserEntityService {
     private UserEntityMapper userEntityMapper;
 
     @Override
-    public List<UserEntity> findByIds(List<Long> uids) {
-        return userEntityMapper.findByIds(uids);
+    public List<UserEntity> findByUids(List<Long> uids) {
+        return userEntityMapper.findByUids(uids);
     }
 
     @Override

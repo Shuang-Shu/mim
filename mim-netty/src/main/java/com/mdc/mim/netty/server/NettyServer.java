@@ -44,8 +44,6 @@ public class NettyServer {
     @Autowired
     private LogInRequestHandler logInRequestHandler;
     @Autowired
-    private LogInOutRequestHandler loginOutRequestHandler;
-    @Autowired
     private ServerExceptionHandler serverExceptionHandler;
     @Autowired
     private ServerHeartBeatTimeoutHandler serverHeartBeatTimeoutHandler;
