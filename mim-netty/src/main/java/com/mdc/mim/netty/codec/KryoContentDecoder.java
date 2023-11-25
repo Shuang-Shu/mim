@@ -7,12 +7,10 @@ import java.util.function.Supplier;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 
-import com.mdc.mim.common.constant.CommonConstant;
+import com.mdc.mim.common.constant.CommonConst;
 import com.mdc.mim.common.utils.ClassIdUtils;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
-import org.springframework.stereotype.Component;
 
 /**
  * Use Kryo to convert object to byte array
@@ -22,7 +20,7 @@ public class KryoContentDecoder extends MessageToMessageDecoder<byte[]> {
     final ThreadLocal<Kryo> serializerThreadLocal;
 
     public KryoContentDecoder() {
-        serializerThreadLocal = ThreadLocal.withInitial(() -> CommonConstant.supplier.get());
+        serializerThreadLocal = ThreadLocal.withInitial(() -> CommonConst.supplier.get());
     }
 
     public KryoContentDecoder(Supplier<Kryo> supplier) {

@@ -1,5 +1,7 @@
 package com.mdc.mim.netty;
 
+import com.mdc.mim.common.constant.ChatMessageTypeConst;
+import com.mdc.mim.common.dto.ChatMessageDTO;
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
 import com.mdc.mim.common.dto.UserDTO;
@@ -10,7 +12,7 @@ import com.mdc.mim.netty.codec.KryoContentDecoder;
 import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
 import com.mdc.mim.netty.codec.MIMByteEncoder;
-import com.mdc.mim.common.constant.CommonConstant;
+import com.mdc.mim.common.constant.CommonConst;
 import com.mdc.mim.common.enumeration.PlatformEnum;
 import com.mdc.mim.common.dto.Message.LogInResponse;
 import com.mdc.mim.common.dto.Message.LogOutRequest;
@@ -53,7 +55,7 @@ public class EndecoderTest {
     static {
         var byteEncoder = new MIMByteEncoder();
         var byteDecoder = new MIMByteDecoder();
-        var kryoSupplier = CommonConstant.supplier;
+        var kryoSupplier = CommonConst.supplier;
         var kryoContentEncoder = new KryoContentEncoder(kryoSupplier);
         var kryoContentDecoder = new KryoContentDecoder(kryoSupplier);
         channelHandlers = new ChannelHandler[]{
@@ -104,11 +106,8 @@ public class EndecoderTest {
 
     @Test
     public void testMessageTransport() {
-//        initialChannelWith(channelHandlers);
-        var req = MessageRequest.builder().id(123L).from(1234L).to(12345L).time(System.currentTimeMillis())
-                .messageType(com.mdc.mim.common.dto.Message.ChatMessageType.TEXT).content("hello world")
-                .url("mimprotocol").property("").fromNick("shuangshu-nick")
-                .json("{\"hello\": \"good\" }").build();
+        var chatMessage = ChatMessageDTO.builder().id(1L).fromUid(1L).toUid(3L).type(ChatMessageTypeConst.TEXT).content("test").build();
+        var req = MessageRequest.builder().id(123L).chatMessage(chatMessage).build();
         var resp = MessageResponse.builder().id(321L).build();
         doTestPipeline(channel, req);
         doTestPipeline(channel, resp);

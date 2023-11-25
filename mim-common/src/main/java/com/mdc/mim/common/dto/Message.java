@@ -1,8 +1,7 @@
 package com.mdc.mim.common.dto;
 
-import com.mdc.mim.common.constant.CommonConstant;
+import com.mdc.mim.common.constant.CommonConst;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
-
 import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,9 +34,9 @@ public class Message {
     // 通知
     MessageNotification messageNotification;
 
-    public enum ChatMessageType {
-        TEXT, COMPLEX
-    }
+//    public enum ChatMessageType {
+//        TEXT, COMPLEX
+//    }
 
     @Data
     @Builder
@@ -46,7 +45,7 @@ public class Message {
     @AllArgsConstructor
     public static class LogInRequest {
         public static LogInRequest buildWith(UserDTO user, long messageId) {
-            return LogInRequest.builder().user(user).id(messageId).appVersion(CommonConstant.APP_VERSION).build();
+            return LogInRequest.builder().user(user).id(messageId).appVersion(CommonConst.APP_VERSION).build();
         }
 
         UserDTO user;
@@ -111,51 +110,28 @@ public class Message {
         long id;
     }
 
+    // 发送方-->服务器的聊天消息请求
     @Data
     @Builder
     @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MessageRequest {
-        long id;
-        Long from;
-        Long to;
-        long time;
-        Message.ChatMessageType messageType;
-        String content;
-        String url;
-        String property;
-        String fromNick;
-        String json;
+        long id; // 请求的id
+        ChatMessageDTO chatMessage;
     }
 
+    // 服务器-->发送方的聊天消息发送，用于告知发送方消息已经成功发送到服务器；只包含用于确认的id
     @Data
     @Builder
     @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MessageResponse {
-        public static MessageResponse buildWith(MessageRequest messageRequest) {
-            // 使用所有字段build
-            return MessageResponse.builder().id(messageRequest.getId()).from(messageRequest.getFrom())
-                    .to(messageRequest.getTo()).time(messageRequest.getTime())
-                    .messageType(messageRequest.getMessageType()).content(messageRequest.getContent())
-                    .url(messageRequest.getUrl()).property(messageRequest.getProperty())
-                    .fromNick(messageRequest.getFromNick()).json(messageRequest.getJson()).build();
-        }
-
-        long id;
-        Long from;
-        Long to;
-        long time;
-        Message.ChatMessageType messageType;
-        String content;
-        String url;
-        String property;
-        String fromNick;
-        String json;
+        long id; // 仅包含请求id
     }
 
+    // 服务器-->接收方的聊天消息通知，用于告知接收方有新的消息；包含消息内容
     @Data
     @Builder
     @Accessors(chain = true)
@@ -163,9 +139,6 @@ public class Message {
     @AllArgsConstructor
     public static class MessageNotification {
         long id;
-        int messagType;
-        boolean sender;
-        String json;
-        long time;
+        ChatMessageDTO chatMessageDTO;
     }
 }

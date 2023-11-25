@@ -1,17 +1,15 @@
 package com.mdc.mim.netty.client.sender;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.netty.session.ClientSession;
-
-import com.mdc.mim.netty.session.state.impl.client.ClientLoginState;
 import com.mdc.mim.netty.session.state.impl.client.ClientNotConnectState;
 import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Data

@@ -50,7 +50,7 @@
         </dependency>
         <dependency>
             <groupId>com.mdc.mim</groupId>
-            <artifactId>mim-user</artifactId>
+            <artifactId>mim-rest</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

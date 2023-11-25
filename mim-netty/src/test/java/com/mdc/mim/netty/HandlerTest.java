@@ -9,7 +9,7 @@ import com.mdc.mim.netty.codec.KryoContentDecoder;
 import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
 import com.mdc.mim.netty.codec.MIMByteEncoder;
-import com.mdc.mim.common.constant.CommonConstant;
+import com.mdc.mim.common.constant.CommonConst;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.enumeration.PlatformEnum;
 import com.mdc.mim.common.dto.Message;
@@ -27,12 +27,12 @@ public class HandlerTest {
 
     static Message.LogInRequest loginReq = Message.LogInRequest.buildWith(userDTO, 1L);
 
-    static Kryo kryo = CommonConstant.supplier.get();
+    static Kryo kryo = CommonConst.supplier.get();
 
     static {
         var byteEncoder = new MIMByteEncoder();
         var byteDecoder = new MIMByteDecoder();
-        var kryoSupplier = CommonConstant.supplier;
+        var kryoSupplier = CommonConst.supplier;
         var kryoContentEncoder = new KryoContentEncoder(kryoSupplier);
         var kryoContentDecoder = new KryoContentDecoder(kryoSupplier);
         channelHandlers = new ChannelHandler[]{

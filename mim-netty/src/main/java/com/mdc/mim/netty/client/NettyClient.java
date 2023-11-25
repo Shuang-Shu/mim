@@ -1,9 +1,7 @@
 package com.mdc.mim.netty.client;
 
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
-import com.mdc.mim.common.constant.HeartBeatConstant;
+import com.mdc.mim.common.constant.CommonConst;
+import com.mdc.mim.common.constant.HeartBeatConst;
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.netty.client.handler.*;
 import com.mdc.mim.netty.client.sender.ChatMessageSender;
@@ -11,33 +9,25 @@ import com.mdc.mim.netty.client.sender.LogInOutSender;
 import com.mdc.mim.netty.codec.KryoContentDecoder;
 import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
+import com.mdc.mim.netty.codec.MIMByteEncoder;
 import com.mdc.mim.netty.server.handler.MessageFormatFilter;
 import com.mdc.mim.netty.session.ClientSession;
 import com.mdc.mim.netty.session.state.StateConstant;
-import com.mdc.mim.netty.session.state.impl.client.ClientLoginState;
 import com.mdc.mim.netty.session.state.impl.client.ClientNotConnectState;
-import io.netty.handler.timeout.IdleStateHandler;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import com.mdc.mim.netty.codec.MIMByteEncoder;
-import com.mdc.mim.common.constant.CommonConstant;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoop;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /*
  * 基于Netty的客户端，是参考代码中NettyClient
@@ -57,8 +47,8 @@ public class NettyClient {
     private int port;
 
     // senders of netty
-    private LogInOutSender loginoutSender = new LogInOutSender();
-    private ChatMessageSender chatMessageSender = new ChatMessageSender();
+    private LogInOutSender loginoutSender = new LogInOutSender(this);
+    private ChatMessageSender chatMessageSender = new ChatMessageSender(this);
 
     private UserDTO user;
 
@@ -117,16 +107,16 @@ public class NettyClient {
                         // 重连机制
                         ch.pipeline().addLast(new ClientReconnectHandler(NettyClient.this));
                         // 心跳相关
-                        ch.pipeline().addLast(new IdleStateHandler(0, HeartBeatConstant.WRITE_IDLE_TIME, 0, TimeUnit.SECONDS));
+                        ch.pipeline().addLast(new IdleStateHandler(0, HeartBeatConst.WRITE_IDLE_TIME, 0, TimeUnit.SECONDS));
                         ch.pipeline().addLast(new ClientHeartBeatTimeoutHandler());
                         ch.pipeline().addLast(new ClientHeartBeatSendingHandler());
                         // 解编码
                         // 入站
                         ch.pipeline().addLast(new MIMByteDecoder());
-                        ch.pipeline().addLast(new KryoContentDecoder(CommonConstant.supplier));
+                        ch.pipeline().addLast(new KryoContentDecoder(CommonConst.supplier));
                         // 出站
                         ch.pipeline().addLast(new MIMByteEncoder());
-                        ch.pipeline().addLast(new KryoContentEncoder(CommonConstant.supplier));
+                        ch.pipeline().addLast(new KryoContentEncoder(CommonConst.supplier));
                         // 业务处理
                         ch.pipeline().addLast(MessageFormatFilter.NAME, new MessageFormatFilter()); // 过滤格式不正确的消息
                         ch.pipeline().addLast(LogInOutResponesHandler.NAME, new LogInOutResponesHandler());
@@ -194,6 +184,11 @@ public class NettyClient {
         if (clientSession != null) {
             clientSession.close();
         }
+    }
+
+    public Long getChatMessageId() {
+        // TODO 简单实现，直接返回系统当前时间，未来需要优化
+        return System.currentTimeMillis();
     }
 
     public void close() {

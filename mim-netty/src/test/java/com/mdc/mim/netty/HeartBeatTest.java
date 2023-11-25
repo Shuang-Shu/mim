@@ -1,16 +1,14 @@
 package com.mdc.mim.netty;
 
-import com.mdc.mim.common.constant.HeartBeatConstant;
+import com.mdc.mim.common.constant.HeartBeatConst;
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.common.utils.DigestUtils;
 import com.mdc.mim.netty.client.NettyClient;
 import com.mdc.mim.netty.server.NettyServer;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.servlet.ThemeResolver;
 
 /**
  * @author ShuangShu
@@ -57,7 +55,7 @@ public class HeartBeatTest implements InitializingBean {
     @Test
     public void testServerIdleTimeoutHandler() throws InterruptedException {
         nettyClient.doConnect();
-        Thread.sleep(HeartBeatConstant.READ_IDLE_TIME * 1000 + 1000);
+        Thread.sleep(HeartBeatConst.READ_IDLE_TIME * 1000 + 1000);
     }
 
     @Test

@@ -3,13 +3,11 @@ package com.mdc.mim.netty.codec;
 import java.util.List;
 
 import com.esotericsoftware.kryo.Kryo;
-import com.mdc.mim.common.constant.CommonConstant;
+import com.mdc.mim.common.constant.CommonConst;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import org.springframework.stereotype.Component;
 
 /*
  * 将字节流转换为byte[]对象
@@ -24,7 +22,7 @@ public class MIMByteDecoder extends ByteToMessageDecoder {
             return;
         }
         var magicNubmer = in.readShort();
-        if (magicNubmer != CommonConstant.MAGIC_NUMBER) {
+        if (magicNubmer != CommonConst.MAGIC_NUMBER) {
             in.resetReaderIndex();
             return;
         }
@@ -33,7 +31,7 @@ public class MIMByteDecoder extends ByteToMessageDecoder {
             return;
         }
         var version = in.readShort();
-        if (version > CommonConstant.APP_VERSION) {
+        if (version > CommonConst.APP_VERSION) {
             in.resetReaderIndex();
             return;
         }

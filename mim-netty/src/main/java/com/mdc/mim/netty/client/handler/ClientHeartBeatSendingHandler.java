@@ -1,6 +1,6 @@
 package com.mdc.mim.netty.client.handler;
 
-import com.mdc.mim.common.constant.HeartBeatConstant;
+import com.mdc.mim.common.constant.HeartBeatConst;
 import com.mdc.mim.common.dto.Message;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -8,7 +8,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
@@ -42,7 +41,7 @@ public class ClientHeartBeatSendingHandler extends ChannelInboundHandlerAdapter 
                     throw new RuntimeException("server is not active, close this channel");
                 }
             }
-        }, HeartBeatConstant.HEART_BEAT_TIME, TimeUnit.SECONDS);
+        }, HeartBeatConst.HEART_BEAT_TIME, TimeUnit.SECONDS);
         future.addListener(
                 new GenericFutureListener() {
                     public void operationComplete(Future future) throws Exception {

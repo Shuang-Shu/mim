@@ -5,7 +5,7 @@ import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.dto.UserDTO;
-import com.mdc.mim.netty.feign.UserService;
+import com.mdc.mim.netty.feign.UserFeignService;
 import com.mdc.mim.netty.server.handler.LogInRequestHandler;
 import com.mdc.mim.netty.server.handler.LogOutRequestHandler;
 import com.mdc.mim.netty.session.ServerSession;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class LogInProcessor implements AbstractProcessor {
     public static final String NAME = "loginProcessor";
     @Autowired
-    private UserService userService;
+    private UserFeignService userFeignService;
     @Autowired
     private ServerSessionManager sessionManager;
     @Autowired
@@ -43,7 +43,7 @@ public class LogInProcessor implements AbstractProcessor {
         // 检查是否已经登录
         if (serverSession.getState().stateDescription().equals(StateConstant.NOT_LOGIN)) {
             var user = loginReq.getUser();
-            var r = userService.identify(user.getUserName(), user.getPasswdMd5());
+            var r = userFeignService.identify(user.getUserName(), user.getPasswdMd5());
             var ok = (Boolean) r.get("valid");
             if (!ok) {
                 loginResp.setCode(ResponsesCodeEnum.FAILED);

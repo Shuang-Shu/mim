@@ -2,7 +2,8 @@ package com.mdc.mim.netty.server.processor;
 
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.dto.Message;
-import com.mdc.mim.netty.feign.FriendService;
+import com.mdc.mim.netty.feign.ChatFeignMessageService;
+import com.mdc.mim.netty.feign.FriendFeignService;
 import com.mdc.mim.netty.session.ServerSession;
 import com.mdc.mim.netty.session.ServerSessionManager;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +20,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class ChatMessageRedirectProcessor implements AbstractProcessor {
     @Autowired
-    private FriendService friendService;
+    private FriendFeignService friendFeignService;
 
     @Autowired
     private ServerSessionManager sessionManager;
+
+    @Autowired
+    private ChatFeignMessageService chatFeignMessageService;
 
     @Override
     public MessageTypeEnum supportType() {
@@ -32,11 +36,11 @@ public class ChatMessageRedirectProcessor implements AbstractProcessor {
     @Override
     public Boolean process(ServerSession serverSession, Message message) {
         var chatMessageReq = message.getMessageRequest();
-        var chatMessageResp = Message.MessageResponse.buildWith(chatMessageReq);
+        var chatMessageResp = Message.MessageResponse.builder().id(chatMessageReq.getId()).build();
         // 发送鉴权
-        var target = chatMessageReq.getTo();
+        var target = chatMessageReq.getChatMessage().getToUid();
         var uid = serverSession.getUser().getUid();
-        var r = friendService.isFriend(uid, target);
+        var r = friendFeignService.isFriend(uid, target);
         if (r == null || !(Boolean) r.get("isFriend")) {
             log.info("not friend");
             return false;

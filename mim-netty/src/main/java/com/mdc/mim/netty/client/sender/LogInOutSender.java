@@ -5,11 +5,18 @@ import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.dto.Message;
 
+import com.mdc.mim.netty.client.NettyClient;
 import io.netty.channel.ChannelFuture;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class LogInOutSender extends AbstractSender {
+    public LogInOutSender(NettyClient client) {
+        this.client = client;
+    }
+
+    private NettyClient client;
+
     public ChannelFuture sendLogin(UserDTO user) {
         var loginRequest = Message.LogInRequest.buildWith(user, getId());
         var msg = Message.builder().messageType(MessageTypeEnum.LOGIN_REQ).logInRequest(loginRequest).build();

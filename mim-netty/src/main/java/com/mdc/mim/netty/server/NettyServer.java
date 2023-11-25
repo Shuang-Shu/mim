@@ -1,11 +1,11 @@
 package com.mdc.mim.netty.server;
 
-import com.mdc.mim.common.constant.HeartBeatConstant;
+import com.mdc.mim.common.constant.HeartBeatConst;
 import com.mdc.mim.netty.codec.KryoContentDecoder;
 import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
 import com.mdc.mim.netty.codec.MIMByteEncoder;
-import com.mdc.mim.common.constant.CommonConstant;
+import com.mdc.mim.common.constant.CommonConst;
 import com.mdc.mim.netty.server.handler.*;
 
 import com.mdc.mim.netty.session.ServerSessionManager;
@@ -63,15 +63,15 @@ public class NettyServer {
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
                     // 心跳相关
-                    ch.pipeline().addLast(new IdleStateHandler(HeartBeatConstant.READ_IDLE_TIME, 0, 0, TimeUnit.SECONDS));
+                    ch.pipeline().addLast(new IdleStateHandler(HeartBeatConst.READ_IDLE_TIME, 0, 0, TimeUnit.SECONDS));
                     ch.pipeline().addLast(serverHeartBeatTimeoutHandler);
                     // 解编码
                     // inbouund
                     ch.pipeline().addLast(new MIMByteDecoder());
-                    ch.pipeline().addLast(new KryoContentDecoder(CommonConstant.supplier));
+                    ch.pipeline().addLast(new KryoContentDecoder(CommonConst.supplier));
                     // outbound
                     ch.pipeline().addLast(new MIMByteEncoder());
-                    ch.pipeline().addLast(new KryoContentEncoder(CommonConstant.supplier));
+                    ch.pipeline().addLast(new KryoContentEncoder(CommonConst.supplier));
                     // handlers
                     ch.pipeline().addLast(MessageFormatFilter.NAME, new MessageFormatFilter()); // 过滤格式不正确的消息
                     ch.pipeline().addLast(LogInRequestHandler.NAME, logInRequestHandler); // 登入处理器

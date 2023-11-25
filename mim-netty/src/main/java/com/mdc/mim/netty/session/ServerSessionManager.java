@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import com.mdc.mim.user.entity.UserEntity;
 import org.springframework.stereotype.Component;
 
 // TODO 未来可实现分布式的session管理

@@ -33,7 +33,7 @@
     </properties>
 
     <modules>
-        <module>mim-user</module>
+        <module>mim-rest</module>
         <module>mim-common</module>
         <module>mim-netty</module>
         <module>mim-cluster</module>
