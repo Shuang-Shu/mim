@@ -6,9 +6,12 @@ import com.mdc.mim.netty.feign.ChatFeignMessageService;
 import com.mdc.mim.netty.feign.FriendFeignService;
 import com.mdc.mim.netty.session.ServerSession;
 import com.mdc.mim.netty.session.ServerSessionManager;
+import com.mdc.mim.netty.utils.ChatMessageSeqNoManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.sql.Date;
 
 /**
  * @author ShuangShu
@@ -28,6 +31,9 @@ public class ChatMessageRedirectProcessor implements AbstractProcessor {
     @Autowired
     private ChatFeignMessageService chatFeignMessageService;
 
+    @Autowired
+    private ChatMessageSeqNoManager chatMessageSeqNoManager;
+
     @Override
     public MessageTypeEnum supportType() {
         return MessageTypeEnum.MESSAGE_REQ;
@@ -35,31 +41,49 @@ public class ChatMessageRedirectProcessor implements AbstractProcessor {
 
     @Override
     public Boolean process(ServerSession serverSession, Message message) {
+        // TODO 格式可优化
         var chatMessageReq = message.getMessageRequest();
-        var chatMessageResp = Message.MessageResponse.builder().id(chatMessageReq.getId()).build();
-        // 发送鉴权
+        var chatMessageResp = Message.MessageResponse.builder().build();
+        // 鉴别发送对象是否为好友
         var target = chatMessageReq.getChatMessage().getToUid();
         var uid = serverSession.getUser().getUid();
         var r = friendFeignService.isFriend(uid, target);
         if (r == null || !(Boolean) r.get("isFriend")) {
+            // 非好友，响应错误消息
+            serverSession.writeAndFlush(Message.builder().id(message.getId()).messageType(MessageTypeEnum.ERR_RESP).info("target is not your friend").build());
             log.info("not friend");
             return false;
         }
-        var messageResp = Message.builder().messageType(MessageTypeEnum.MESSAGE_RESP).messageResponse(chatMessageResp).build();
+        var messagesToBeSent = serverSession.getContinuousMessages();
         var sessions = sessionManager.getSessionsByUid(target);
+        // 消息持久化
+        for (var messageToBeSent : messagesToBeSent) {
+            // 消息持久化(TODO 此种方式会导致每次发送消息时都产生磁盘写入，未来使用MQ缓解)
+            var chatMessage = messageToBeSent.getMessageRequest().getChatMessage();
+            chatMessage.setCreateTime(new Date(System.currentTimeMillis()));
+            chatFeignMessageService.saveMessage(chatMessage);
+        }
+        // 写回响应消息
+        serverSession.writeAndFlush(Message.builder().id(message.getId()).messageType(MessageTypeEnum.MESSAGE_RESP).messageResponse(chatMessageResp).info("send message success").build());
         if (sessions == null || sessions.isEmpty()) {
-            // TODO 此处需要实现离线消息，如果用户不在线，将消息存储到数据库中，等用户上线后再发送
             log.info("target {} not online", target);
             return true;
         }
-        try {
-            for (var session : sessions) {
-                session.writeAndFlush(messageResp);
+        for (var messageToBeSent : messagesToBeSent) {
+            var chatMessage = messageToBeSent.getMessageRequest().getChatMessage();
+            // 鉴定为好友，向对方发送消息
+            var notify = Message.MessageNotify.builder().chatMessageDTO(chatMessageReq.getChatMessage().setId(chatMessage.getId())).build();
+            var notifyMessage = Message.builder().id(message.getId()).messageType(MessageTypeEnum.MESSAGE_NOTIFY).messageNotify(notify).build();
+            try {
+                for (var session : sessions) {
+                    session.writeAndFlush(notifyMessage);
+                }
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
             }
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
         }
+        return true;
     }
 }

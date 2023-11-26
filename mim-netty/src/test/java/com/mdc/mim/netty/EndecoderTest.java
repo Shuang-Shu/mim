@@ -3,6 +3,7 @@ package com.mdc.mim.netty;
 import com.mdc.mim.common.constant.ChatMessageTypeConst;
 import com.mdc.mim.common.dto.ChatMessageDTO;
 import com.mdc.mim.common.dto.Message;
+import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
 import com.mdc.mim.common.dto.UserDTO;
 import org.junit.jupiter.api.BeforeAll;
@@ -89,17 +90,17 @@ public class EndecoderTest {
     @Test
     public void testLoginTransport() {
 //        initialChannelWith(channelHandlers);
-        var req = Message.LogInRequest.buildWith(userDTO, 1L);
-        doTestPipeline(channel, req);
-        var resp = LogInResponse.builder().code(ResponsesCodeEnum.SUCCESS).id(123L).info("success").expose(9).build();
+        var loginRequest = Message.LogInRequest.builder().user(userDTO).appVersion(CommonConst.APP_VERSION).build();
+        doTestPipeline(channel, loginRequest);
+        var resp = Message.builder().id(123L).messageType(MessageTypeEnum.LOGIN_RESP).logInResponse(LogInResponse.builder().code(ResponsesCodeEnum.SUCCESS).info("success").build());
         doTestPipeline(channel, resp);
     }
 
     @Test
     public void testLogoutTransport() {
 //        initialChannelWith(channelHandlers);
-        var req = LogOutRequest.builder().id(123L).build();
-        var resp = LogOutResponse.builder().id(321L).build();
+        var req = LogOutRequest.builder().build();
+        var resp = LogOutResponse.builder().build();
         doTestPipeline(channel, req);
         doTestPipeline(channel, resp);
     }
@@ -107,7 +108,7 @@ public class EndecoderTest {
     @Test
     public void testMessageTransport() {
         var chatMessage = ChatMessageDTO.builder().id(1L).fromUid(1L).toUid(3L).type(ChatMessageTypeConst.TEXT).content("test").build();
-        var req = MessageRequest.builder().id(123L).chatMessage(chatMessage).build();
+        var req = MessageRequest.builder().chatMessage(chatMessage).build();
         var resp = MessageResponse.builder().id(321L).build();
         doTestPipeline(channel, req);
         doTestPipeline(channel, resp);

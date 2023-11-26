@@ -1,6 +1,5 @@
 package com.mdc.mim.common.dto;
 
-import com.mdc.mim.common.constant.CommonConst;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
 import lombok.AllArgsConstructor;
@@ -15,6 +14,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Message {
+    Long id;
     MessageTypeEnum messageType; // 消息类型
     String sessionId; // 请求中携带的sessionId
     String info; // 响应中携带的信息
@@ -25,18 +25,11 @@ public class Message {
     // 登出
     LogOutRequest logOutRequest;
     LogOutResponse logOutResponse;
-    // keep-alive
-    KeepAliveRequest keepAliveRequest;
-    KeepAliveResponse keepAliveResponse;
     // 聊天
     MessageRequest messageRequest;
     MessageResponse messageResponse;
     // 通知
-    MessageNotification messageNotification;
-
-//    public enum ChatMessageType {
-//        TEXT, COMPLEX
-//    }
+    MessageNotify messageNotify;
 
     @Data
     @Builder
@@ -44,13 +37,8 @@ public class Message {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LogInRequest {
-        public static LogInRequest buildWith(UserDTO user, long messageId) {
-            return LogInRequest.builder().user(user).id(messageId).appVersion(CommonConst.APP_VERSION).build();
-        }
-
         UserDTO user;
-        long id;
-        int appVersion;
+        Integer appVersion;
     }
 
     @Data
@@ -59,12 +47,10 @@ public class Message {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LogInResponse {
-        long id;
         ResponsesCodeEnum code;
         UserDTO user;
         String info;
         String sessionId;
-        int expose; // 存疑
     }
 
     @Data
@@ -73,12 +59,7 @@ public class Message {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LogOutRequest {
-        public static LogOutRequest buildWith(UserDTO user, long messageId) {
-            return LogOutRequest.builder().user(user).id(messageId).build();
-        }
-
         UserDTO user;
-        long id;
     }
 
     @Data
@@ -87,27 +68,8 @@ public class Message {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LogOutResponse {
-        long id;
         String info;
         ResponsesCodeEnum code;
-    }
-
-    @Data
-    @Builder
-    @Accessors(chain = true)
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class KeepAliveRequest {
-        long id;
-    }
-
-    @Data
-    @Builder
-    @Accessors(chain = true)
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class KeepAliveResponse {
-        long id;
     }
 
     // 发送方-->服务器的聊天消息请求
@@ -117,7 +79,6 @@ public class Message {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MessageRequest {
-        long id; // 请求的id
         ChatMessageDTO chatMessage;
     }
 
@@ -137,7 +98,7 @@ public class Message {
     @Accessors(chain = true)
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class MessageNotification {
+    public static class MessageNotify {
         long id;
         ChatMessageDTO chatMessageDTO;
     }

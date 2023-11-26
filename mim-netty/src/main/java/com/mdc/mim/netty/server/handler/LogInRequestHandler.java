@@ -8,6 +8,7 @@ import com.mdc.mim.common.utils.IDUtils;
 import com.mdc.mim.netty.server.processor.LogInProcessor;
 import com.mdc.mim.netty.session.ServerSession;
 import com.mdc.mim.netty.session.ServerSessionManager;
+import com.mdc.mim.netty.utils.ChatMessageSeqNoManager;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -33,6 +34,9 @@ public class LogInRequestHandler extends ChannelInboundHandlerAdapter {
     @Autowired
     private LogInProcessor loginProcessor;
 
+    @Autowired
+    private ChatMessageSeqNoManager chatMessageSeqNoManager;
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         var message = (Message) msg;
@@ -49,10 +53,12 @@ public class LogInRequestHandler extends ChannelInboundHandlerAdapter {
         if (serverSession == null) {
             // 尚未保存会话，添加到SessionManager中
             serverSession = new ServerSession(ctx.channel());
+            serverSession.setChatMessageSeqNoManager(chatMessageSeqNoManager);
             serverSession.setSessionId(IDUtils.getSessionId());
             sessionManager.addSession(serverSession.getSessionId(), serverSession);
         }
         final var session = serverSession;
+        session.pushMessage(message); // 消息加入队列
         // 异步处理认证流程
         CallbackExecutor.instance().execute(
                 new CallbackTask<Boolean>() {

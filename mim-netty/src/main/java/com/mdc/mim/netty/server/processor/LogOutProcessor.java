@@ -34,8 +34,8 @@ public class LogOutProcessor implements AbstractProcessor {
     @Override
     public Boolean process(ServerSession serverSession, Message message) {
         var logoutReq = message.getLogOutRequest();
-        var logoutResp = Message.LogOutResponse.builder().id(logoutReq.getId()).build();
-        var respMessage = Message.builder().messageType(MessageTypeEnum.LOGOUT_RESP).logOutResponse(logoutResp).build();
+        var logoutResp = Message.LogOutResponse.builder().build();
+        var respMessage = Message.builder().id(message.getId()).messageType(MessageTypeEnum.LOGOUT_RESP).logOutResponse(logoutResp).build();
         sessionManager.removeSession(message.getSessionId());
         logoutResp.setCode(ResponsesCodeEnum.SUCCESS);
         // 发送消息
@@ -43,6 +43,7 @@ public class LogOutProcessor implements AbstractProcessor {
             serverSession.writeAndFlush(respMessage).sync();
             serverSession.logOutSuccess(message);
             // 将serverSession从SessionManager中移除
+            sessionManager.userLogOut(serverSession);
             sessionManager.removeSession(serverSession.getSessionId());
             serverSession.setUser(null);
             // 重新添加LogInRequestHandler

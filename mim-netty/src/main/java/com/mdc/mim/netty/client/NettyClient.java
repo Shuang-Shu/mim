@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /*
  * 基于Netty的客户端，是参考代码中NettyClient
@@ -42,6 +43,9 @@ public class NettyClient {
         this.port = port;
     }
 
+    // 本地客户端相关
+    private String clientName;
+
     // 远程服务器相关
     private String host;
     private int port;
@@ -49,6 +53,13 @@ public class NettyClient {
     // senders of netty
     private LogInOutSender loginoutSender = new LogInOutSender(this);
     private ChatMessageSender chatMessageSender = new ChatMessageSender(this);
+
+    {
+        // 设置id生成器
+        var atomicId = new AtomicLong(0L);
+        loginoutSender.setAtomicId(atomicId);
+        chatMessageSender.setAtomicId(atomicId);
+    }
 
     private UserDTO user;
 
@@ -75,7 +86,7 @@ public class NettyClient {
                     TimeUnit.SECONDS);
         } else {
             // 连接成功，创建ClientSession
-            log.info("successfully connected IM server!");
+            log.info("{} successfully connected IM server!", clientName);
             var channel = f.channel();
             // 创建会话
             clientSession = new ClientSession(channel);
@@ -119,12 +130,13 @@ public class NettyClient {
                         ch.pipeline().addLast(new KryoContentEncoder(CommonConst.supplier));
                         // 业务处理
                         ch.pipeline().addLast(MessageFormatFilter.NAME, new MessageFormatFilter()); // 过滤格式不正确的消息
-                        ch.pipeline().addLast(LogInOutResponesHandler.NAME, new LogInOutResponesHandler());
+                        ch.pipeline().addLast(LogInOutResponesHandler.NAME, new LogInOutResponesHandler(NettyClient.this));
+                        ch.pipeline().addLast(ChatMessageResponseHandler.NAME, new ChatMessageResponseHandler(NettyClient.this));
+                        ch.pipeline().addLast(ChatMessageNotifyHandler.NAME, new ChatMessageNotifyHandler(NettyClient.this));
                         // exception处理
                         ch.pipeline().addLast(ClientExceptionHandler.NAME, new ClientExceptionHandler());
                     }
                 });
-
         log.info("client connecting");
     }
 
@@ -133,6 +145,7 @@ public class NettyClient {
             log.error("user is not set yet");
             throw new RuntimeException("user is not set yet");
         }
+        loginoutSender.resetIdGenerator();
         try {
             var cf = b.connect();
             cf.addListener(connectedListener); // 添加连接监听器

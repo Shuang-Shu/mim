@@ -30,6 +30,7 @@ public class HeartBeatTest implements InitializingBean {
         // 启动服务端
         var t1 = new Thread(
                 () -> {
+                    nettyServer.init();
                     nettyServer.start();
                 }
         );

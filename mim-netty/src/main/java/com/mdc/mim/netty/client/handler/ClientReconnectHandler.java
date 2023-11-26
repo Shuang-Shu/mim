@@ -8,9 +8,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.EventLoop;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +20,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2023/11/23 10:39
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Slf4j
 @ChannelHandler.Sharable
 public class ClientReconnectHandler extends ChannelInboundHandlerAdapter {

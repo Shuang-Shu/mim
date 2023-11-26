@@ -36,9 +36,9 @@ public class LogInProcessor implements AbstractProcessor {
     @Override
     public Boolean process(ServerSession serverSession, Message message) {
         var loginReq = message.getLogInRequest();
-        var loginResp = Message.LogInResponse.builder().id(loginReq.getId())
-                .info("successfully identified").sessionId(serverSession.getSessionId()).expose(0).build();
-        var respMessage = Message.builder().messageType(MessageTypeEnum.LOGIN_RESP).logInResponse(loginResp).build();
+        var loginResp = Message.LogInResponse.builder()
+                .info("successfully identified").sessionId(serverSession.getSessionId()).build();
+        var respMessage = Message.builder().id(message.getId()).messageType(MessageTypeEnum.LOGIN_RESP).logInResponse(loginResp).build();
         boolean result = false;
         // 检查是否已经登录
         if (serverSession.getState().stateDescription().equals(StateConstant.NOT_LOGIN)) {
@@ -50,7 +50,6 @@ public class LogInProcessor implements AbstractProcessor {
                 loginResp.setInfo("identify failed, wrong username or password");
             } else {
                 loginResp.setCode(ResponsesCodeEnum.SUCCESS);
-                // TODO 此处暂时手动进行类型转换
                 var objectMapper = new ObjectMapper();
                 var userDto = objectMapper.convertValue(r.get("user"), UserDTO.class);
                 loginResp.setUser(userDto);
@@ -70,6 +69,7 @@ public class LogInProcessor implements AbstractProcessor {
             var pipeline = serverSession.getChannel().pipeline();
             pipeline.addBefore(LogInRequestHandler.NAME, LogOutRequestHandler.NAME, logOutRequestHandler);
             serverSession.getChannel().pipeline().remove(LogInRequestHandler.NAME);
+            sessionManager.userLogIn(serverSession);
         }
         var f = serverSession.writeAndFlush(respMessage);
         f.addListener(

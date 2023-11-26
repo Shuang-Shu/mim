@@ -1,14 +1,15 @@
 package com.mdc.mim.netty.server;
 
+import com.mdc.mim.common.constant.CommonConst;
 import com.mdc.mim.common.constant.HeartBeatConst;
 import com.mdc.mim.netty.codec.KryoContentDecoder;
 import com.mdc.mim.netty.codec.KryoContentEncoder;
 import com.mdc.mim.netty.codec.MIMByteDecoder;
 import com.mdc.mim.netty.codec.MIMByteEncoder;
-import com.mdc.mim.common.constant.CommonConst;
+import com.mdc.mim.netty.feign.MaxSeqFeignService;
 import com.mdc.mim.netty.server.handler.*;
-
 import com.mdc.mim.netty.session.ServerSessionManager;
+import com.mdc.mim.netty.utils.ChatMessageSeqNoManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
@@ -49,38 +50,49 @@ public class NettyServer {
     private ServerHeartBeatTimeoutHandler serverHeartBeatTimeoutHandler;
     @Autowired
     private ServerSessionManager sessionManager;
-    private ServerBootstrap b = new ServerBootstrap();
+    @Autowired
+    private MaxSeqFeignService maxSeqFeignService;
+    @Autowired
+    private ChatMessageSeqNoManager chatMessageSeqNoManager;
+
+    private final ServerBootstrap b = new ServerBootstrap();
+
+    private NioEventLoopGroup bossLoopGroup;
+    private NioEventLoopGroup workerLoopGroup;
+
+    public void init() {
+        // 配置bootstrap
+        bossLoopGroup = new NioEventLoopGroup(1); // boss线程组只需要一个线程
+        workerLoopGroup = new NioEventLoopGroup();
+        b.group(bossLoopGroup, workerLoopGroup);
+        b.channel(NioServerSocketChannel.class);
+        b.childOption(ChannelOption.SO_KEEPALIVE, true);
+        b.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
+        b.childHandler(new ChannelInitializer<SocketChannel>() {
+            @Override
+            protected void initChannel(SocketChannel ch) throws Exception {
+                // 心跳相关
+                ch.pipeline().addLast(new IdleStateHandler(HeartBeatConst.READ_IDLE_TIME, 0, 0, TimeUnit.SECONDS));
+                ch.pipeline().addLast(serverHeartBeatTimeoutHandler);
+                // 解编码
+                // inbouund
+                ch.pipeline().addLast(new MIMByteDecoder());
+                ch.pipeline().addLast(new KryoContentDecoder(CommonConst.supplier));
+                // outbound
+                ch.pipeline().addLast(new MIMByteEncoder());
+                ch.pipeline().addLast(new KryoContentEncoder(CommonConst.supplier));
+                // handlers
+                ch.pipeline().addLast(MessageFormatFilter.NAME, new MessageFormatFilter()); // 过滤格式不正确的消息
+                ch.pipeline().addLast(LogInRequestHandler.NAME, logInRequestHandler); // 登入处理器
+                ch.pipeline().addLast(ChatMessageRedirectHandler.NAME, chatMessageRedirectHandler);
+                // exception处理
+                ch.pipeline().addLast(ServerExceptionHandler.NAME, serverExceptionHandler);
+            }
+        });
+    }
 
     public void start() {
-        var bossLoopGroup = new NioEventLoopGroup(1);
-        var workerLoopGroup = new NioEventLoopGroup();
         try {
-            b.group(bossLoopGroup, workerLoopGroup);
-            b.channel(NioServerSocketChannel.class);
-            b.childOption(ChannelOption.SO_KEEPALIVE, true);
-            b.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
-            b.childHandler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                protected void initChannel(SocketChannel ch) throws Exception {
-                    // 心跳相关
-                    ch.pipeline().addLast(new IdleStateHandler(HeartBeatConst.READ_IDLE_TIME, 0, 0, TimeUnit.SECONDS));
-                    ch.pipeline().addLast(serverHeartBeatTimeoutHandler);
-                    // 解编码
-                    // inbouund
-                    ch.pipeline().addLast(new MIMByteDecoder());
-                    ch.pipeline().addLast(new KryoContentDecoder(CommonConst.supplier));
-                    // outbound
-                    ch.pipeline().addLast(new MIMByteEncoder());
-                    ch.pipeline().addLast(new KryoContentEncoder(CommonConst.supplier));
-                    // handlers
-                    ch.pipeline().addLast(MessageFormatFilter.NAME, new MessageFormatFilter()); // 过滤格式不正确的消息
-                    ch.pipeline().addLast(LogInRequestHandler.NAME, logInRequestHandler); // 登入处理器
-//                    ch.pipeline().addLast(loginOutRequestHandler);
-                    ch.pipeline().addLast(ChatMessageRedirectHandler.NAME, chatMessageRedirectHandler);
-                    // exception处理
-                    ch.pipeline().addLast(ServerExceptionHandler.NAME, serverExceptionHandler);
-                }
-            });
             var channelFuture = b.bind(this.host, this.port).sync();
             log.info("server started");
             channelFuture.channel().closeFuture().sync(); // 等待关闭的同步事件，保持服务器常开

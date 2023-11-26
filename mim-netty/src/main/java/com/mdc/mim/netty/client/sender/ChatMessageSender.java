@@ -26,8 +26,8 @@ public class ChatMessageSender extends AbstractSender {
         if (user != null) {
             // TODO 此处需要自动生成消息id
             var chatMessage = ChatMessageDTO.builder().id(client.getChatMessageId()).fromUid(user.getUid()).toUid(toUid).type(0).content(content).build();
-            var chatMessageRequest = Message.MessageRequest.builder().id(getId()).chatMessage(chatMessage).build();
-            var msg = Message.builder().sessionId(getClientSession().getSessionId())
+            var chatMessageRequest = Message.MessageRequest.builder().chatMessage(chatMessage).build();
+            var msg = Message.builder().id(getId()).sessionId(getClientSession().getSessionId())
                     .messageType(MessageTypeEnum.MESSAGE_REQ).messageRequest(chatMessageRequest).build();
             log.debug("sending chat message: {}", msg);
             return super.sendMessage(msg);

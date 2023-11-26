@@ -15,9 +15,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @Data
 public abstract class AbstractSender {
     ClientSession clientSession;
-    protected static AtomicLong atomicId = new AtomicLong();
+    protected AtomicLong atomicId;
 
-    protected static long getId() {
+    protected long getId() {
         return atomicId.getAndIncrement();
     }
 
@@ -56,5 +56,9 @@ public abstract class AbstractSender {
 
     protected UserDTO getUser() {
         return clientSession.getUser();
+    }
+
+    public final void resetIdGenerator() {
+        atomicId.set(0L);
     }
 }

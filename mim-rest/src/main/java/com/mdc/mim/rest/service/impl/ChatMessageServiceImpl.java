@@ -4,7 +4,11 @@ import com.mdc.mim.rest.entity.ChatMessageEntity;
 import com.mdc.mim.rest.mapper.ChatMessageMapper;
 import com.mdc.mim.rest.service.ChatMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author ShuangShu
@@ -19,8 +23,20 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
     // 保存消息
     @Override
+    @CachePut(value = "chatMessage", key = "#chatMessageEntity.id")
     public int insertChatMessage(ChatMessageEntity chatMessageEntity) {
         return chatMessageMapper.insertChatMessage(chatMessageEntity);
+    }
+
+    @Override
+    @Cacheable(value = "chatMessage", key = "#id")
+    public ChatMessageEntity findById(Long id) {
+        return chatMessageMapper.findById(id);
+    }
+
+    @Override
+    public List<ChatMessageEntity> findByFromUidAndToUid(Long fromUid, Long toUid) {
+        return chatMessageMapper.findByFromUidAndToUid(fromUid, toUid);
     }
 
     @Override

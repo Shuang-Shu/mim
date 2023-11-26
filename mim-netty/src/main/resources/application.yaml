@@ -4,6 +4,11 @@ spring:
     name: mim-netty
   main:
     allow-circular-references: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: ss
+    password: 1234
 # 日志设置
 logging:
   level:

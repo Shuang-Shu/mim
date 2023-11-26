@@ -19,6 +19,11 @@
     </properties>
 
     <dependencies>
+        <!--    rabbit-mq    -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
         <!-- 负载均衡器 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

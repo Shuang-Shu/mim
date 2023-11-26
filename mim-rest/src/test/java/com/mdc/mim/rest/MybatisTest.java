@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.mdc.mim.common.constant.ChatMessageTypeConst;
 import com.mdc.mim.common.constant.UserStatusConst;
 import com.mdc.mim.rest.entity.ChatMessageEntity;
+import com.mdc.mim.rest.entity.MaxSeqEntity;
 import com.mdc.mim.rest.entity.UserEntity;
 import com.mdc.mim.rest.entity.UserStatusEntity;
 import com.mdc.mim.rest.mapper.*;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.sql.Date;
+import java.util.List;
 
 @SpringBootTest
 public class MybatisTest {
@@ -30,6 +32,8 @@ public class MybatisTest {
     private FriendMapper friendMapper;
     @Autowired
     private ChatMessageMapper chatMessageMapper;
+    @Autowired
+    private MaxSeqMapper maxSeqMapper;
 
     ChatMessageEntity testChatMessageEntity = ChatMessageEntity.builder().id(1L).fromUid(1L).toUid(2L).type(ChatMessageTypeConst.TEXT).content("hello").createTime(new Date(System.currentTimeMillis())).build();
 
@@ -145,5 +149,12 @@ public class MybatisTest {
         Assertions.assertEquals("hello", chatMessage.getContent());
         ret = chatMessageMapper.deleteById(1L);
         Assertions.assertEquals(1, ret);
+    }
+
+    @Test
+    public void testMaxSeqMapper() {
+        var maxSeq = MaxSeqEntity.builder().uid(1L).maxSeq(1L).build();
+        var list = List.of(maxSeq);
+        maxSeqMapper.updateMaxSeqs(list);
     }
 }

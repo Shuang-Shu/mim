@@ -1,5 +1,6 @@
 package com.mdc.mim.netty.client.sender;
 
+import com.mdc.mim.common.constant.CommonConst;
 import com.mdc.mim.common.dto.UserDTO;
 
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
@@ -18,15 +19,15 @@ public class LogInOutSender extends AbstractSender {
     private NettyClient client;
 
     public ChannelFuture sendLogin(UserDTO user) {
-        var loginRequest = Message.LogInRequest.buildWith(user, getId());
-        var msg = Message.builder().messageType(MessageTypeEnum.LOGIN_REQ).logInRequest(loginRequest).build();
-        log.debug("sending login request: {}", msg);
+        var loginRequest = Message.LogInRequest.builder().user(user).appVersion(CommonConst.APP_VERSION).build();
+        var msg = Message.builder().id(getId()).messageType(MessageTypeEnum.LOGIN_REQ).logInRequest(loginRequest).build();
+        log.info("sending login request: {}", msg);
         return super.sendMessage(msg);
     }
 
     public ChannelFuture sendLogout(UserDTO user) {
-        var logoutRequest = Message.LogOutRequest.buildWith(user, getId());
-        var msg = Message.builder().messageType(MessageTypeEnum.LOGOUT_REQ).logOutRequest(logoutRequest).sessionId(clientSession.getSessionId()).build();
+        var logoutRequest = Message.LogOutRequest.builder().user(user).build();
+        var msg = Message.builder().id(getId()).messageType(MessageTypeEnum.LOGOUT_REQ).logOutRequest(logoutRequest).sessionId(clientSession.getSessionId()).build();
         log.debug("sending logout request: {}", msg);
         return super.sendMessage(msg);
     }

@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.jdbc.AutoConfigureDataJdbc;
 import org.springframework.boot.test.context.SpringBootTest;
 
 /**
@@ -19,7 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @Slf4j
 @SpringBootTest
-public class ChatTest implements InitializingBean {
+public class SingleChatTest implements InitializingBean {
     @Autowired
     NettyServer nettyServer;
 
@@ -28,6 +27,7 @@ public class ChatTest implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         var t1 = new Thread(() -> {
+            nettyServer.init();
             nettyServer.start();
         });
         t1.start();
@@ -41,6 +41,7 @@ public class ChatTest implements InitializingBean {
     public void testBasic() throws InterruptedException {
         nettyClient.doLogin();
         Thread.sleep(500);
-        nettyClient.doSend(3L, "test_message_content");
+        for (int i = 0; i < 30; i++)
+            nettyClient.doSend(3L, "test_message_content_" + i);
     }
 }

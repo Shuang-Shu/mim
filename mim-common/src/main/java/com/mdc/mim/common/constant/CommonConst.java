@@ -1,6 +1,7 @@
 package com.mdc.mim.common.constant;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.mdc.mim.common.dto.ChatMessageDTO;
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.dto.Message.*;
 import com.mdc.mim.common.dto.UserDTO;
@@ -20,10 +21,8 @@ public class CommonConst {
     private static final Class<?>[] messageClasses = {
             String.class, Message.class, ChatMessageTypeConst.class, MessageTypeEnum.class, ResponsesCodeEnum.class, UserDTO.class,
             Message.LogInRequest.class, LogInResponse.class, LogOutRequest.class,
-            LogOutResponse.class,
-            KeepAliveRequest.class, KeepAliveResponse.class,
-            MessageRequest.class, MessageResponse.class, MessageNotification.class, PlatformEnum.class,
-            ResponsesCodeEnum.class
+            LogOutResponse.class, MessageRequest.class, MessageResponse.class, MessageNotify.class, PlatformEnum.class,
+            ResponsesCodeEnum.class, ChatMessageDTO.class
     };
 
     public static final Supplier<Kryo> supplier = () -> {

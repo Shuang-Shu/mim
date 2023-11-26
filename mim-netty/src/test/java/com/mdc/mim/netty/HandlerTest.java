@@ -25,7 +25,7 @@ public class HandlerTest {
 
     static UserDTO userDTO = UserDTO.builder().userName("test").passwdMd5("test").devId("dev-1").platformEnum(PlatformEnum.LINUX).build();
 
-    static Message.LogInRequest loginReq = Message.LogInRequest.buildWith(userDTO, 1L);
+    static Message.LogInRequest loginReq = Message.LogInRequest.builder().user(userDTO).appVersion(CommonConst.APP_VERSION).build();
 
     static Kryo kryo = CommonConst.supplier.get();
 

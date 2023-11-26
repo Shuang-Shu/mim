@@ -2,24 +2,20 @@ package com.mdc.mim.netty;
 
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.common.utils.DigestUtils;
+import com.mdc.mim.netty.client.NettyClient;
+import com.mdc.mim.netty.server.NettyServer;
 import com.mdc.mim.netty.session.state.StateConstant;
-import com.mdc.mim.netty.session.state.impl.client.ClientLoginState;
 import com.mdc.mim.netty.session.state.impl.client.ClientNotLoginState;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.mdc.mim.netty.client.NettyClient;
-import com.mdc.mim.netty.server.NettyServer;
-
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @SpringBootTest
-public class ClientTest implements InitializingBean {
+public class SingleClientTest implements InitializingBean {
 
     @Autowired
     NettyServer nettyServer;
@@ -29,6 +25,7 @@ public class ClientTest implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         var t1 = new Thread(() -> {
+            nettyServer.init();
             nettyServer.start();
         });
         t1.start();
@@ -67,6 +64,11 @@ public class ClientTest implements InitializingBean {
         for (int i = 0; i < 10; i++) {
             testSingleLoginOut();
         }
+    }
+
+    @Test
+    public void testNotLogIn() {
+        nettyClient.doLogout();
     }
 
     /**

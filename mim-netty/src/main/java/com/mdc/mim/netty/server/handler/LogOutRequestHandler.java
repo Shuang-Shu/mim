@@ -6,7 +6,6 @@ import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.netty.server.processor.LogOutProcessor;
 import com.mdc.mim.netty.session.AbstractSession;
-import com.mdc.mim.netty.session.ServerSession;
 import com.mdc.mim.netty.session.ServerSessionManager;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -33,7 +32,7 @@ public class LogOutRequestHandler extends ChannelInboundHandlerAdapter {
     private ServerSessionManager sessionManager;
 
     @Autowired
-    private LogOutProcessor logoutProcessor;
+    private LogOutProcessor logOutProcessor;
 
     @Autowired
     private LogInRequestHandler logInRequestHandler;
@@ -58,6 +57,7 @@ public class LogOutRequestHandler extends ChannelInboundHandlerAdapter {
             super.channelRead(ctx, msg);
             return;
         }
+        serverSession.pushMessage(message);
         log.info("successfully receiving logoutRequest(server)");
 
         final var session = serverSession;
@@ -81,7 +81,7 @@ public class LogOutRequestHandler extends ChannelInboundHandlerAdapter {
 
                     @Override
                     public Boolean call() throws Exception {
-                        return logoutProcessor.process(session, (Message) msg);
+                        return logOutProcessor.process(session, (Message) msg);
                     }
                 }
         );

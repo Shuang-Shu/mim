@@ -19,6 +19,9 @@ public interface ChatMessageMapper {
     @Select("SELECT * FROM chat_message WHERE id = #{id}")
     ChatMessageEntity findById(@Param("id") Long id);
 
+    @Select("SELECT * FROM chat_message WHERE fromUid = #{fromUid} AND toUid = #{toUid}")
+    List<ChatMessageEntity> findByFromUidAndToUid(@Param("fromUid") Long fromUid, @Param("toUid") Long toUid);
+
     // 查询所有聊天记录
     @Select("SELECT * FROM ChatMessage")
     List<ChatMessageEntity> findAll();

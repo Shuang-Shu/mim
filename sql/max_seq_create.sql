@@ -1,0 +1,4 @@
+CREATE TABLE max_seq (
+    uid BIGINT PRIMARY KEY,
+    maxSeq BIGINT NOT NULL
+)ENGINE=InnoDB,CHARSET=utf8mb4;

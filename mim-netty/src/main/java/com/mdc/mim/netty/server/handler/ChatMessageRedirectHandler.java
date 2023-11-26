@@ -40,15 +40,15 @@ public class ChatMessageRedirectHandler extends ChannelInboundHandlerAdapter {
             log.error("serverSession is null");
             throw new RuntimeException("serverSession is null");
         }
-        log.info("successfully receiving chatMessage(server)");
-        log.debug("successfully receiving chatMessage(server): {}", msg);
+        serverSession.pushMessage(message);
+        log.info("successfully receiving chatMessage(server) {}", message);
         // 1 异步处理鉴权及消息转发
         CallbackExecutor.instance().execute(
                 new CallbackTask<Boolean>() {
                     @Override
                     public void onBack(Boolean success) {
                         if (success) {
-                            log.info("redirect message success");
+//                            log.info("redirect message success");
                         } else {
                             log.error("redirect message failed");
                         }
