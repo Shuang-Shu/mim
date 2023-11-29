@@ -24,8 +24,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     // 保存消息
     @Override
     @CachePut(value = "chatMessage", key = "#chatMessageEntity.id")
-    public int insertChatMessage(ChatMessageEntity chatMessageEntity) {
-        return chatMessageMapper.insertChatMessage(chatMessageEntity);
+    public int insertChatMessages(List<ChatMessageEntity> chatMessageEntity) {
+        return chatMessageMapper.insertChatMessages(chatMessageEntity);
     }
 
     @Override

@@ -6,6 +6,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
+
 /**
  * @author ShuangShu
  * @version 1.0
@@ -15,5 +17,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(value = "mim-rest", contextId = "chat-message-service")
 public interface ChatFeignMessageService {
     @PostMapping("/message/save")
-    public R saveMessage(@RequestBody ChatMessageDTO messageDTO);
+    public R saveMessage(@RequestBody List<ChatMessageDTO> messageDTOs);
 }

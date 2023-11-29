@@ -31,6 +31,8 @@ public interface ChatMessageMapper {
             "VALUES (#{id}, #{fromUid}, #{toUid}, #{type}, #{content}, #{createTime})")
     int insertChatMessage(ChatMessageEntity chatMessage);
 
+    int insertChatMessages(List<ChatMessageEntity> chatMessageEntities);
+
     // 更新聊天记录
     @Update("UPDATE chat_message SET fromUid = #{fromUid}, toUid = #{toUid}, type = #{type}, " +
             "content = #{content}, createTime = #{createTime} WHERE id = #{id}")

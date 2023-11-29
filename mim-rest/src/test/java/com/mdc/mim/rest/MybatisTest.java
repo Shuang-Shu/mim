@@ -157,4 +157,11 @@ public class MybatisTest {
         var list = List.of(maxSeq);
         maxSeqMapper.updateMaxSeqs(list);
     }
+
+    @Test
+    public void testSaveChatMessages() {
+        var chatMessage = ChatMessageEntity.builder().id(1L).fromUid(1L).toUid(2L).type(ChatMessageTypeConst.TEXT).content("hello").createTime(new Date(System.currentTimeMillis())).build();
+        var messages = List.of(chatMessage);
+        chatMessageMapper.insertChatMessages(messages);
+    }
 }

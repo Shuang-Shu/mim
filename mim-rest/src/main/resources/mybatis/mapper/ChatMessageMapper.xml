@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mdc.mim.rest.mapper.ChatMessageMapper">
+    <insert id="insertChatMessages" parameterType="ChatMessageEntity">
+        INSERT INTO chat_message(id, fromUid, toUid, type, content, createTime) VALUES
+        <foreach collection='chatMessageEntities' item='item' index='index' separator=','>
+            (#{item.id}, #{item.fromUid}, #{item.toUid}, #{item.type}, #{item.content}, #{item.createTime})
+        </foreach>
+    </insert>
 </mapper>

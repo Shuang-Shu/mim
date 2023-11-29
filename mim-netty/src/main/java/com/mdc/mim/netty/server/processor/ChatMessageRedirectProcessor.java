@@ -1,7 +1,7 @@
 package com.mdc.mim.netty.server.processor;
 
-import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.dto.Message;
+import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.netty.feign.ChatFeignMessageService;
 import com.mdc.mim.netty.feign.FriendFeignService;
 import com.mdc.mim.netty.session.ServerSession;
@@ -57,11 +57,10 @@ public class ChatMessageRedirectProcessor implements AbstractProcessor {
         var messagesToBeSent = serverSession.getContinuousMessages();
         var sessions = sessionManager.getSessionsByUid(target);
         // 消息持久化
-        for (var messageToBeSent : messagesToBeSent) {
-            // 消息持久化(TODO 此种方式会导致每次发送消息时都产生磁盘写入，未来使用MQ缓解)
-            var chatMessage = messageToBeSent.getMessageRequest().getChatMessage();
-            chatMessage.setCreateTime(new Date(System.currentTimeMillis()));
-            chatFeignMessageService.saveMessage(chatMessage);
+        var chatMessageDTOs = messagesToBeSent.stream().map(t -> t.getMessageRequest().getChatMessage().setCreateTime(new Date(System.currentTimeMillis()))).toList();
+        if (chatMessageDTOs.size() > 0) {
+            chatFeignMessageService.saveMessage(chatMessageDTOs);
+            log.info("saving messages, len= {}", chatMessageDTOs.size());
         }
         // 写回响应消息
         serverSession.writeAndFlush(Message.builder().id(message.getId()).messageType(MessageTypeEnum.MESSAGE_RESP).messageResponse(chatMessageResp).info("send message success").build());

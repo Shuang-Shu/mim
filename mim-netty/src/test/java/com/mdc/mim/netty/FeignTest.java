@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.sql.Date;
+import java.util.List;
 
 /**
  * @author ShuangShu
@@ -56,7 +57,7 @@ public class FeignTest {
     @Test
     public void testChatMessageService() {
         Assertions.assertNotNull(chatFeignMessageService);
-        var r = chatFeignMessageService.saveMessage(message);
+        var r = chatFeignMessageService.saveMessage(List.of(message));
         // r.get("code")不等于0时，断言报错并打印r.get("error")
         System.out.println(r.get("error"));
     }

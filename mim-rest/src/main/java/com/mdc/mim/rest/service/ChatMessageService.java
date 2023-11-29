@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface ChatMessageService {
     // 保存消息
-    int insertChatMessage(ChatMessageEntity chatMessageEntity);
+    int insertChatMessages(List<ChatMessageEntity> chatMessageEntity);
 
     ChatMessageEntity findById(Long id);
 

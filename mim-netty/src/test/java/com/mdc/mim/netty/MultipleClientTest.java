@@ -73,8 +73,11 @@ public class MultipleClientTest implements InitializingBean {
 
     @Test
     public void testMultipleSend() throws InterruptedException {
-        for (int i = 0; i < 30; i++) {
-            nettyClients[0].doSend(2L, "test_message_content_" + i);
+        for (int ii = 0; ii < 60; ii++) {
+            for (int i = 0; i < 20; i++) {
+                nettyClients[0].doSend(2L, "test_message_content_" + i);
+            }
+            Thread.sleep(2000);
         }
     }
 }
