@@ -41,6 +41,7 @@
         <module>mim-manage</module>
         <module>mim-netty/mim-netty-client</module>
         <module>mim-netty/mim-netty-server</module>
+        <module>mim-netty/mim-netty-common</module>
     </modules>
 
     <dependencies>
