@@ -1,5 +1,6 @@
 package com.mdc.mim.netty.session;
 
+import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.netty.session.state.ISessionState;
 import io.netty.channel.Channel;
@@ -49,4 +50,6 @@ public abstract class AbstractSession {
             }
         });
     }
+
+    public abstract void pushMessage(Message message);
 }

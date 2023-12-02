@@ -2,7 +2,7 @@ package com.mdc.mim.netty.server.processor;
 
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
-import com.mdc.mim.netty.feign.ChatFeignMessageService;
+import com.mdc.mim.netty.feign.ChatMessageFeignService;
 import com.mdc.mim.netty.feign.FriendFeignService;
 import com.mdc.mim.netty.session.ServerSession;
 import com.mdc.mim.netty.session.ServerSessionManager;
@@ -29,7 +29,7 @@ public class ChatMessageRedirectProcessor implements AbstractProcessor {
     private ServerSessionManager sessionManager;
 
     @Autowired
-    private ChatFeignMessageService chatFeignMessageService;
+    private ChatMessageFeignService chatMessageFeignService;
 
     @Autowired
     private ChatMessageSeqNoManager chatMessageSeqNoManager;
@@ -59,7 +59,7 @@ public class ChatMessageRedirectProcessor implements AbstractProcessor {
         // 消息持久化
         var chatMessageDTOs = messagesToBeSent.stream().map(t -> t.getMessageRequest().getChatMessage().setCreateTime(new Date(System.currentTimeMillis()))).toList();
         if (chatMessageDTOs.size() > 0) {
-            chatFeignMessageService.saveMessage(chatMessageDTOs);
+            chatMessageFeignService.saveMessage(chatMessageDTOs);
             log.info("saving messages, len= {}", chatMessageDTOs.size());
         }
         // 写回响应消息
@@ -84,5 +84,9 @@ public class ChatMessageRedirectProcessor implements AbstractProcessor {
             }
         }
         return true;
+    }
+
+    private void sendToSession(ServerSession session, Message message) {
+        session.writeAndFlush(message);
     }
 }

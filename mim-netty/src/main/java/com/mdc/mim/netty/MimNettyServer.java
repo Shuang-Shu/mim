@@ -15,8 +15,8 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, })
 @ComponentScan("com.mdc.mim.netty")
 @EnableFeignClients // 启用openfeign
-public class MimNettyApplication {
+public class MimNettyServer {
     public static void main(String[] args) {
-        SpringApplication.run(MimNettyApplication.class, args);
+        SpringApplication.run(MimNettyServer.class, args);
     }
 }

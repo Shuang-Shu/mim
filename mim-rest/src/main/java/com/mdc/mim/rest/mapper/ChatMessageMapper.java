@@ -23,7 +23,7 @@ public interface ChatMessageMapper {
     List<ChatMessageEntity> findByFromUidAndToUid(@Param("fromUid") Long fromUid, @Param("toUid") Long toUid);
 
     // 查询所有聊天记录
-    @Select("SELECT * FROM ChatMessage")
+    @Select("SELECT * FROM chat_message")
     List<ChatMessageEntity> findAll();
 
     // 插入聊天记录

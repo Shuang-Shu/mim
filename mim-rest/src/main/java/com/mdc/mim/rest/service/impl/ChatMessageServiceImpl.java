@@ -35,6 +35,11 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     }
 
     @Override
+    public List<ChatMessageEntity> findAll() {
+        return chatMessageMapper.findAll();
+    }
+
+    @Override
     public List<ChatMessageEntity> findByFromUidAndToUid(Long fromUid, Long toUid) {
         return chatMessageMapper.findByFromUidAndToUid(fromUid, toUid);
     }

@@ -3,6 +3,7 @@ package com.mdc.mim.netty.client.handler;
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.netty.client.NettyClient;
+import com.mdc.mim.netty.session.AbstractSession;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -31,6 +32,7 @@ public class ChatMessageNotifyHandler extends ChannelInboundHandlerAdapter {
         if (message.getMessageType().equals(MessageTypeEnum.MESSAGE_NOTIFY)) {
             // TODO 目前只实现TEXT类型的消息
             log.info("{} receive message content: {}", nettyClient.getClientName(), message.getMessageNotify().getChatMessageDTO().getContent());
+            ctx.channel().attr(AbstractSession.SESSION_KEY).get().pushMessage(message); // 将消息放入会话中
         } else {
             super.channelRead(ctx, msg);
         }

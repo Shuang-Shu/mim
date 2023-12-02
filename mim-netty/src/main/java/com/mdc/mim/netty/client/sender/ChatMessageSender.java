@@ -29,6 +29,7 @@ public class ChatMessageSender extends AbstractSender {
             var chatMessageRequest = Message.MessageRequest.builder().chatMessage(chatMessage).build();
             var msg = Message.builder().id(getId()).sessionId(getClientSession().getSessionId())
                     .messageType(MessageTypeEnum.MESSAGE_REQ).messageRequest(chatMessageRequest).build();
+            client.addNotAckedMessage(msg);
             log.debug("sending chat message: {}", msg);
             return super.sendMessage(msg);
         } else {

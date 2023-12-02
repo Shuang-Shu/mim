@@ -15,3 +15,4 @@ public interface ISessionState {
 
     String stateDescription();
 }
+

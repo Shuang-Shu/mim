@@ -16,6 +16,8 @@ public interface ChatMessageService {
 
     ChatMessageEntity findById(Long id);
 
+    List<ChatMessageEntity> findAll();
+
     List<ChatMessageEntity> findByFromUidAndToUid(Long fromUid, Long toUid);
 
     // 删除消息

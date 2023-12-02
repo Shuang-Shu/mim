@@ -11,11 +11,12 @@ import java.util.concurrent.*;
 public class ThreadPoolUtils {
     public static ExecutorService getDefaultFixedThreadPoolExecutor() {
         return new ThreadPoolExecutor(
+                // TODO 此处使用无界队列，需要考虑OOM问题
                 ThreadUtils.CPU_COUNT >> 1,
                 ThreadUtils.CPU_COUNT << 1,
                 120L,
                 TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(64),
+                new LinkedBlockingQueue<>(),
                 ThreadUtils.getThreadFactory("default-fixed"),
                 new ThreadPoolExecutor.AbortPolicy() // 拒绝策略
         );

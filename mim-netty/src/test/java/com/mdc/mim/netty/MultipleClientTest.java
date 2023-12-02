@@ -3,8 +3,10 @@ package com.mdc.mim.netty;
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.common.utils.DigestUtils;
 import com.mdc.mim.netty.client.NettyClient;
+import com.mdc.mim.netty.feign.ChatMessageFeignService;
 import com.mdc.mim.netty.server.NettyServer;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ import java.util.Arrays;
 public class MultipleClientTest implements InitializingBean {
     @Autowired
     NettyServer nettyServer;
+    @Autowired
+    ChatMessageFeignService chatMessageFeignService;
 
     NettyClient[] nettyClients = new NettyClient[2];
     String[] userNames = {"shuangshu", "huamao"};
@@ -73,12 +77,15 @@ public class MultipleClientTest implements InitializingBean {
 
     @Test
     public void testMultipleSend() throws InterruptedException {
-        for (int ii = 0; ii < 60; ii++) {
-            for (int i = 0; i < 20; i++) {
+        int init = (Integer) chatMessageFeignService.countUnreadMessage().get("count");
+        for (int ii = 0; ii < 10; ii++) {
+            for (int i = 0; i < 200; i++) {
                 nettyClients[0].doSend(2L, "test_message_content_" + i);
             }
-            Thread.sleep(2000);
+            Thread.sleep(500);
         }
+        int end = (Integer) chatMessageFeignService.countUnreadMessage().get("count");
+        Assertions.assertEquals(init + 2000, end);
     }
 }
 

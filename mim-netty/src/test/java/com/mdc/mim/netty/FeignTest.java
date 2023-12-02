@@ -3,7 +3,7 @@ package com.mdc.mim.netty;
 import com.mdc.mim.common.constant.ChatMessageTypeConst;
 import com.mdc.mim.common.dto.ChatMessageDTO;
 import com.mdc.mim.common.utils.DigestUtils;
-import com.mdc.mim.netty.feign.ChatFeignMessageService;
+import com.mdc.mim.netty.feign.ChatMessageFeignService;
 import com.mdc.mim.netty.feign.FriendFeignService;
 import com.mdc.mim.netty.feign.UserFeignService;
 import org.junit.jupiter.api.Assertions;
@@ -29,7 +29,7 @@ public class FeignTest {
     private FriendFeignService friendFeignService;
 
     @Autowired
-    private ChatFeignMessageService chatFeignMessageService;
+    private ChatMessageFeignService chatMessageFeignService;
 
     ChatMessageDTO message = ChatMessageDTO.builder().id(0L).fromUid(1L).toUid(2L).content("hello").type(ChatMessageTypeConst.TEXT).createTime(new Date(System.currentTimeMillis())).build();
 
@@ -56,8 +56,8 @@ public class FeignTest {
 
     @Test
     public void testChatMessageService() {
-        Assertions.assertNotNull(chatFeignMessageService);
-        var r = chatFeignMessageService.saveMessage(List.of(message));
+        Assertions.assertNotNull(chatMessageFeignService);
+        var r = chatMessageFeignService.saveMessage(List.of(message));
         // r.get("code")不等于0时，断言报错并打印r.get("error")
         System.out.println(r.get("error"));
     }

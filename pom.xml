@@ -39,6 +39,8 @@
         <module>mim-cluster</module>
         <module>mim-client</module>
         <module>mim-manage</module>
+        <module>mim-netty/mim-netty-client</module>
+        <module>mim-netty/mim-netty-server</module>
     </modules>
 
     <dependencies>

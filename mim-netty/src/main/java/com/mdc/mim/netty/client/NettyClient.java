@@ -2,6 +2,8 @@ package com.mdc.mim.netty.client;
 
 import com.mdc.mim.common.constant.CommonConst;
 import com.mdc.mim.common.constant.HeartBeatConst;
+import com.mdc.mim.common.dto.ChatMessageDTO;
+import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.netty.client.handler.*;
 import com.mdc.mim.netty.client.sender.ChatMessageSender;
@@ -27,6 +29,9 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -38,6 +43,13 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 @NoArgsConstructor
 public class NettyClient {
+    private final int RESEND_INTERVAL = 5000;
+
+    /**
+     * @description: 本地Netty客户端构造函数，分别传入服务器地址和端口
+     * @author ShuangShu
+     * @date: 2023/12/2 23:35
+     */
     public NettyClient(String host, int port) {
         this.host = host;
         this.port = port;
@@ -53,6 +65,20 @@ public class NettyClient {
     // senders of netty
     private LogInOutSender loginoutSender = new LogInOutSender(this);
     private ChatMessageSender chatMessageSender = new ChatMessageSender(this);
+
+    private final Map<Long, Message> notAckedMessage = new HashMap<>(); // 未被确认的消息，确认消息由XXXResponse实现
+
+    public void addNotAckedMessage(Message message) {
+        synchronized (notAckedMessage) {
+            notAckedMessage.put(message.getId(), message);
+        }
+    }
+
+    public synchronized void ackMessage(Message message) {
+        synchronized (notAckedMessage) {
+            notAckedMessage.remove(message.getId());
+        }
+    }
 
     {
         // 设置id生成器
@@ -138,6 +164,34 @@ public class NettyClient {
                     }
                 });
         log.info("client connecting");
+        // 启动消息重发守护线程
+        var resendThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(RESEND_INTERVAL);
+                } catch (InterruptedException e) {
+                }
+                resend();
+            }
+        });
+        resendThread.setDaemon(true);
+        resendThread.start();
+    }
+
+    private void resend() {
+        if (notAckedMessage.isEmpty()) {
+            return;
+        }
+        synchronized (notAckedMessage) {
+            // 目前简单地进行重发
+            var ids = notAckedMessage.keySet();
+            for (Long id : ids) {
+                var message = notAckedMessage.get(id);
+                log.info("resending message's id={}", message.getId());
+                // 重发
+                clientSession.writeAndFlush(message);
+            }
+        }
     }
 
     public ChannelFuture doConnect() {
@@ -191,6 +245,10 @@ public class NettyClient {
             log.error("connecting {}:{} failed", host, port);
         }
         return chatMessageSender.sendChatMessage(toUid, content);
+    }
+
+    public List<ChatMessageDTO> getChatMessage(Long fromUid) {
+        return clientSession.getChatMessages(fromUid);
     }
 
     public void closeSession() {

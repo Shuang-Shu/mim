@@ -39,6 +39,8 @@ public class NettyServer {
     private String host;
     @Value("${mim.server.port}")
     private int port;
+    @Value("${mim.server.test.enabled}")
+    private boolean testEnabled;
     // handlers
     @Autowired
     private ChatMessageRedirectHandler chatMessageRedirectHandler;
@@ -83,7 +85,9 @@ public class NettyServer {
                 ch.pipeline().addLast(new KryoContentEncoder(CommonConst.supplier));
                 // handlers
                 ch.pipeline().addLast(MessageFormatFilter.NAME, new MessageFormatFilter()); // 过滤格式不正确的消息
-                ch.pipeline().addLast(LogInRequestHandler.NAME, logInRequestHandler); // 登入处理器
+                if (!testEnabled) {
+                    ch.pipeline().addLast(LogInRequestHandler.NAME, logInRequestHandler); // 登入处理器（压测模式下不启用）
+                }
                 ch.pipeline().addLast(ChatMessageRedirectHandler.NAME, chatMessageRedirectHandler);
                 // exception处理
                 ch.pipeline().addLast(ServerExceptionHandler.NAME, serverExceptionHandler);

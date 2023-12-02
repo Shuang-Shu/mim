@@ -15,7 +15,10 @@ import java.util.List;
  * @date 2023/11/25 12:57
  */
 @FeignClient(value = "mim-rest", contextId = "chat-message-service")
-public interface ChatFeignMessageService {
+public interface ChatMessageFeignService {
     @PostMapping("/message/save")
     public R saveMessage(@RequestBody List<ChatMessageDTO> messageDTOs);
+
+    @PostMapping("/message/count")
+    public R countUnreadMessage();
 }

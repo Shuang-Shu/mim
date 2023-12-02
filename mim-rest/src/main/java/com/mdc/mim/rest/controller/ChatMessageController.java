@@ -36,4 +36,15 @@ public class ChatMessageController {
             return R.error().put("error", e.getMessage());
         }
     }
+
+    @PostMapping("/message/count")
+    public R countUnreadMessage() {
+        try {
+            log.info("rest service counting unread messages");
+            var count = chatMessageService.findAll().size();
+            return R.ok().put("count", count);
+        } catch (Exception e) {
+            return R.error().put("error", e.getMessage());
+        }
+    }
 }
