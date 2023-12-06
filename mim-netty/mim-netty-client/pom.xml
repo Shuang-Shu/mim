@@ -23,6 +23,18 @@
             <groupId>com.mdc.mim</groupId>
             <artifactId>mim-rest</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <!-- 负载均衡器 -->
+                <exclusion>
+                    <groupId>org.springframework.cloud</groupId>
+                    <artifactId>spring-cloud-loadbalancer</artifactId>
+                </exclusion>
+                <!--    nacos    -->
+                <exclusion>
+                    <groupId>com.alibaba.cloud</groupId>
+                    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.mdc.mim</groupId>

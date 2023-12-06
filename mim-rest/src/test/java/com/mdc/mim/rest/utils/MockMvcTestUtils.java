@@ -1,17 +1,17 @@
-package com.mdc.mim.common.utils;
+package com.mdc.mim.rest.utils;
 
-import java.util.Map;
-
+import com.mdc.mim.common.dto.R;
+import com.mdc.mim.common.utils.JsonUtils;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.mdc.mim.common.dto.R;
+import java.util.Map;
 
 public class MockMvcTestUtils {
     public static R mockPerformPost(MockMvc mvc, MockHttpSession session, String url,
-            Map<String, String> params) throws Exception {
+                                    Map<String, String> params) throws Exception {
         var req = MockMvcRequestBuilders.post(url).session(session);
         for (var key : params.keySet()) {
             req.param(key, String.valueOf(params.get(key)));

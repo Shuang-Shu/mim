@@ -12,7 +12,7 @@ spring:
 # 日志设置
 logging:
   level:
-    com.mdc.mim: info
+    com.mdc.mim: debug
 
 # mim server配置
 mim:
@@ -21,7 +21,7 @@ mim:
     host: localhost
     port: 8080
     test:
-      enabled: false # 启用压力测试
+      enabled: true # 启用压力测试
 
 # nacos配置
 nacos:

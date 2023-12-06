@@ -24,8 +24,7 @@ public class ChatMessageSender extends AbstractSender {
     public ChannelFuture sendChatMessage(Long toUid, String content) {
         var user = getUser();
         if (user != null) {
-            // TODO 此处需要自动生成消息id
-            var chatMessage = ChatMessageDTO.builder().id(client.getChatMessageId()).fromUid(user.getUid()).toUid(toUid).type(0).content(content).build();
+            var chatMessage = ChatMessageDTO.builder().fromUid(user.getUid()).toUid(toUid).type(0).content(content).build();
             var chatMessageRequest = Message.MessageRequest.builder().chatMessage(chatMessage).build();
             var msg = Message.builder().id(getId()).sessionId(getClientSession().getSessionId())
                     .messageType(MessageTypeEnum.MESSAGE_REQ).messageRequest(chatMessageRequest).build();

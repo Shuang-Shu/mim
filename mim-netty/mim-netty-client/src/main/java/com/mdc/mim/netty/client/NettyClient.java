@@ -145,8 +145,7 @@ public class NettyClient {
                         ch.pipeline().addLast(new ClientReconnectHandler(NettyClient.this));
                         // 心跳相关
                         ch.pipeline().addLast(new IdleStateHandler(0, HeartBeatConst.WRITE_IDLE_TIME, 0, TimeUnit.SECONDS));
-                        ch.pipeline().addLast(new ClientHeartBeatTimeoutHandler());
-                        ch.pipeline().addLast(new ClientHeartBeatSendingHandler());
+                        ch.pipeline().addLast(ClientHeartBeatTimeoutHandler.NAME, new ClientHeartBeatTimeoutHandler());
                         // 解编码
                         // 入站
                         ch.pipeline().addLast(new MIMByteDecoder());
@@ -169,9 +168,10 @@ public class NettyClient {
             while (true) {
                 try {
                     Thread.sleep(RESEND_INTERVAL);
+                    resend();
                 } catch (InterruptedException e) {
+                    continue;
                 }
-                resend();
             }
         });
         resendThread.setDaemon(true);
@@ -187,7 +187,7 @@ public class NettyClient {
             var ids = notAckedMessage.keySet();
             for (Long id : ids) {
                 var message = notAckedMessage.get(id);
-                log.info("resending message's id={}", message.getId());
+                log.info("resending message. id={}", message.getId());
                 // 重发
                 clientSession.writeAndFlush(message);
             }
@@ -257,12 +257,8 @@ public class NettyClient {
         }
     }
 
-    public Long getChatMessageId() {
-        // TODO 简单实现，直接返回系统当前时间，未来需要优化
-        return System.currentTimeMillis();
-    }
-
     public void close() {
+        log.info("client closing...");
         try {
             if (clientSession != null) {
                 clientSession.close();

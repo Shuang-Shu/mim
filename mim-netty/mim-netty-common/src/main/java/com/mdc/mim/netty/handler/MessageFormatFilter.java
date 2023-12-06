@@ -22,9 +22,11 @@ public class MessageFormatFilter extends ChannelInboundHandlerAdapter {
         var message = (Message) msg;
         if (message.getMessageType() == null) {
             throw new RuntimeException("message: " + msg + " format error! messageType is null");
-        } else if (message.getMessageType() == MessageTypeEnum.ERR_RESP) {
+        } else if (message.getMessageType().equals(MessageTypeEnum.ERR_RESP)) {
             var info = message.getInfo();
             throw new RuntimeException(info);
+        } else if (message.getMessageType().equals(MessageTypeEnum.HEARTBEAT_REQ)) {
+            return;
         }
         super.channelRead(ctx, msg);
     }

@@ -2,6 +2,8 @@ package com.mdc.mim.netty.session;
 
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
+import com.mdc.mim.common.exception.CycleBufferException;
+import com.mdc.mim.common.utils.CycleBuffer;
 import com.mdc.mim.netty.session.state.IServerSessionState;
 import com.mdc.mim.netty.session.state.impl.server.ServerNotLoginState;
 import com.mdc.mim.netty.utils.ChatMessageSeqNoManager;
@@ -12,53 +14,51 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class ServerSession extends AbstractSession implements IServerSessionState {
-    private PriorityQueue<Message> chatMessageHeap = new PriorityQueue<>(
-            new Comparator<Message>() {
-                @Override
-                public int compare(Message m1, Message m2) {
-                    return m1.getId().compareTo(m2.getId());
-                }
-            }
-    );
+    private static final long LOCK_FLAG = 1L << 63;
+    private static final int MESSAGE_BUFFER_CAPACITY = 128;
 
-    private Long nextMessageId = 0L;
+    private CycleBuffer<Message> messageBuffer = new CycleBuffer<>(MESSAGE_BUFFER_CAPACITY);
     private ChatMessageSeqNoManager chatMessageSeqNoManager;
+    private AtomicLong nextId = new AtomicLong(0L); // 当前组写入DB的首个消息的ID
+    private long nextNextId = 0L; // 下一组写入DB的首个消息ID
 
     // 目前直接使用synchronized来实现线程安全，后续可以考虑使用更高效的方法
     public synchronized void pushMessage(Message message) {
-        chatMessageHeap.add(message);
+        try {
+            messageBuffer.setAt(message.getId(), message);
+        } catch (CycleBufferException e) {
+            // 消息过旧或超限
+            log.error("pushMessage error", e);
+        }
     }
 
-    public synchronized List<Message> getContinuousMessages() {
-        // TODO 目前简单地使用优先队列来实现，后续可以考虑使用更高效的数据结构
+    public List<Message> getContinuousMessages() {
         var continuousMessages = new ArrayList<Message>();
-        while (!chatMessageHeap.isEmpty()) {
-            var message = chatMessageHeap.peek();
-            if (message.getId().equals(nextMessageId)) {
-                message = chatMessageHeap.poll();
-                if (message.getMessageType().equals(MessageTypeEnum.MESSAGE_REQ)) {
-                    message.getMessageRequest().getChatMessage().setId(chatMessageSeqNoManager.getSeqNo(getUser().getUid()));
-                    continuousMessages.add(message);
-                }
-                nextMessageId++;
-            } else if (message.getId() < nextMessageId) {
-                // 重复消息，直接丢弃
-                chatMessageHeap.poll();
-            } else if (message.getId() > nextMessageId) {
-                // 丢失消息，直接返回，等待下一次轮询
-                break;
+        Message nextMessage;
+        if ((LOCK_FLAG & (nextId.get())) == 0) {
+            return continuousMessages;
+        }
+        nextNextId = nextId.get() & (~LOCK_FLAG);
+        while ((nextMessage = messageBuffer.next()) != null) {
+            nextNextId++;
+            if (nextMessage.getMessageType().equals(MessageTypeEnum.MESSAGE_REQ)) {
+                nextMessage.getMessageRequest().getChatMessage().setId(chatMessageSeqNoManager.getSeqNo(getUser().getUid()));
+                continuousMessages.add(nextMessage);
             }
         }
         return continuousMessages;
+    }
+
+    public Message peekMessage() {
+        return messageBuffer.peek();
     }
 
     public ServerSession(Channel channel) {
@@ -66,6 +66,33 @@ public class ServerSession extends AbstractSession implements IServerSessionStat
         this.state = new ServerNotLoginState(this);
         // 将当前ServerSession绑定到channel中
         this.bindChannel(channel);
+    }
+
+    /**
+     * @description: 锁住首个消息的id，保证只有一个processor能够将消息写入DB
+     * @param:
+     * @return:
+     * @author ShuangShu
+     * @date: 2023/12/6 21:15
+     */
+    public boolean lockId(long expected) {
+        long val = nextId.get();
+        if ((val & LOCK_FLAG) != 0) {
+            return false;
+        }
+        return nextId.compareAndSet(expected, expected ^ LOCK_FLAG);
+    }
+
+    public void unlockId(long oldId) {
+        long val = nextId.get();
+        if ((val & LOCK_FLAG) == 0) {
+            return;
+        }
+        nextId.compareAndSet(oldId | LOCK_FLAG, nextNextId);
+    }
+
+    public long getNextId() {
+        return nextId.get();
     }
 
     @Override

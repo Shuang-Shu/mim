@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ChannelHandler.Sharable
 public class ClientHeartBeatTimeoutHandler extends ChannelInboundHandlerAdapter {
+    public static final String NAME = "clientHeartBeatTimeoutHandler";
+
     /**
      * @description: 如果接收到IdleState.WRITE_IDLE事件，则向服务器发送一个心跳包
      * @param:
@@ -25,8 +27,7 @@ public class ClientHeartBeatTimeoutHandler extends ChannelInboundHandlerAdapter 
             var state = (IdleStateEvent) evt;
             if (state.state() == IdleState.WRITER_IDLE) {
                 var clientSession = ctx.channel().attr(ClientSession.SESSION_KEY).get();
-                // 关闭客户端Session
-                // TODO 此处应当执行重连逻辑，而非直接关闭客户端
+                // 关闭客户端Session，重连handler执行重连逻辑
                 clientSession.close();
             }
         } else {

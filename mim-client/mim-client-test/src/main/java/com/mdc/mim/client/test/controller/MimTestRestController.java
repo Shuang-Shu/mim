@@ -3,9 +3,7 @@ package com.mdc.mim.client.test.controller;
 import com.mdc.mim.common.dto.R;
 import com.mdc.mim.netty.client.NettyClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
 
@@ -20,9 +18,9 @@ public class MimTestRestController {
     @Autowired
     NettyClient nettyClient;
 
-    @PostMapping("/mim/client/test/send")
-    public R send(String content) {
-        nettyClient.doSend(3L, content);
+    @PostMapping("/mim/client/test/send/{toUid}")
+    public R send(@RequestBody String content, @PathVariable("toUid") Long toUid) {
+        nettyClient.doSend(toUid, content);
         return R.ok();
     }
 

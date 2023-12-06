@@ -24,7 +24,7 @@ public class ChatMessageResponseHandler extends ChannelInboundHandlerAdapter {
         var message = (Message) msg;
         if (message.getMessageType().equals(MessageTypeEnum.MESSAGE_RESP)) {
             nettyClient.ackMessage(message); // 收到消息响应，从未响应列表中移除
-            log.info("{} receive message response, id: {}", nettyClient.getClientName(), message.getId());
+            log.debug("{} receive message response, id: {}", nettyClient.getClientName(), message.getId());
         } else {
             super.channelRead(ctx, msg); // 将消息传递给下一个handler
         }

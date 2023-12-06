@@ -33,6 +33,9 @@ public class LogInOutResponesHandler extends ChannelInboundHandlerAdapter {
                 clientSession.getState().logInSuccess(message);
                 clientSession.setUser(loginResp.getUser());
                 log.info("{}, added heartbeat handler", nettyClient.getClientName());
+                var heartBeatHandler = new ClientHeartBeatSendingHandler();
+                ctx.pipeline().addAfter(ClientHeartBeatTimeoutHandler.NAME, ClientHeartBeatSendingHandler.NAME, heartBeatHandler);
+                heartBeatHandler.ping(ctx);
             } else {
                 log.error("login failed: {}", loginResp.getInfo());
             }
@@ -43,6 +46,8 @@ public class LogInOutResponesHandler extends ChannelInboundHandlerAdapter {
                 // Client状态转换为未登录
                 clientSession.getState().logOutSuccess(message);
                 clientSession.setUser(null);
+                // 删除心跳handler
+                ctx.pipeline().remove(ClientHeartBeatSendingHandler.NAME);
             } else {
                 log.error("logout failed: {}", logoutResp.getInfo());
             }

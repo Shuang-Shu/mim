@@ -24,6 +24,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 @NoArgsConstructor
-public class NettyServer {
+public class NettyServer implements InitializingBean {
     public NettyServer(String host, int port) {
         this.host = host;
         this.port = port;
@@ -89,9 +90,7 @@ public class NettyServer {
                 ch.pipeline().addLast(new KryoContentEncoder(CommonConst.supplier));
                 // handlers
                 ch.pipeline().addLast(MessageFormatFilter.NAME, new MessageFormatFilter()); // 过滤格式不正确的消息
-                if (!testEnabled) {
-                    ch.pipeline().addLast(LogInRequestHandler.NAME, logInRequestHandler); // 登入处理器（压测模式下不启用）
-                }
+                ch.pipeline().addLast(LogInRequestHandler.NAME, logInRequestHandler); // 登入处理器
                 ch.pipeline().addLast(ChatMessageRedirectHandler.NAME, chatMessageRedirectHandler);
                 // exception处理
                 ch.pipeline().addLast(ServerExceptionHandler.NAME, serverExceptionHandler);
@@ -117,6 +116,21 @@ public class NettyServer {
         if (session != null) {
             session.close();
             sessionManager.removeSession(sessionId);
+        }
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (!testEnabled) {
+            var serverThread = new Thread(
+                    () -> {
+                        init();
+                        start();
+                    }
+            );
+            serverThread.start();
+        } else {
+            log.info("test mode, should start server manually");
         }
     }
 }

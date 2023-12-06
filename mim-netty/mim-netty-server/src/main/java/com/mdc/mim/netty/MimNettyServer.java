@@ -12,7 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @description: TODO
  * @date 2023/11/13 22:35
  */
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, })
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class,})
 @ComponentScan("com.mdc.mim.netty")
 @EnableFeignClients // 启用openfeign
 public class MimNettyServer {

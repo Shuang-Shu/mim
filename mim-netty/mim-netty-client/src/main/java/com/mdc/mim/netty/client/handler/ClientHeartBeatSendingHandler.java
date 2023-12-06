@@ -2,6 +2,7 @@ package com.mdc.mim.netty.client.handler;
 
 import com.mdc.mim.common.constant.HeartBeatConst;
 import com.mdc.mim.common.dto.Message;
+import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -20,15 +21,16 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @ChannelHandler.Sharable
 public class ClientHeartBeatSendingHandler extends ChannelInboundHandlerAdapter {
-    public static final Message HEART_BEAT = Message.builder().build();
+    public static final String NAME = "clientHeartBeatSendingHandler";
+    public static final Message HEART_BEAT = Message.builder().messageType(MessageTypeEnum.HEARTBEAT_REQ).build();
 
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.info("client channel active... ");
-        ping(ctx);
-    }
+//    @Override
+//    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+//        log.info("client channel active... ");
+//        ping(ctx);
+//    }
 
-    private void ping(ChannelHandlerContext ctx) {
+    public void ping(ChannelHandlerContext ctx) {
         var future = ctx.channel().eventLoop().schedule(new Runnable() {
             @Override
             public void run() {

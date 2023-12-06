@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.mdc.mim.common.utils.DigestUtils;
 import com.mdc.mim.common.utils.JsonUtils;
-import com.mdc.mim.common.utils.MockMvcTestUtils;
+import com.mdc.mim.rest.utils.MockMvcTestUtils;
 import com.mdc.mim.rest.entity.UserEntity;
 
 @SpringBootTest

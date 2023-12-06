@@ -21,12 +21,7 @@
     <dependencies>
         <dependency>
             <groupId>com.mdc.mim</groupId>
-            <artifactId>mim-rest</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mdc.mim</groupId>
-            <artifactId>mim-netty-common</artifactId>
+            <artifactId>mim-netty-client</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <!--    rabbit-mq    -->

@@ -24,6 +24,8 @@ public class MimNettyClientConfiguration implements DisposableBean {
     private String host;
     @Value("${mim.client.test.port}")
     private int port;
+    @Value("${mim.client.test.name}")
+    private String clientName;
 
     private NettyClient nettyClient;
 
@@ -33,6 +35,7 @@ public class MimNettyClientConfiguration implements DisposableBean {
         // 使用user初始化
         var user = UserDTO.builder().userName(username).passwdMd5(DigestUtils.md5(password)).build();
         nettyClient.init(user);
+        nettyClient.setClientName(clientName);
         nettyClient.doConnect().sync();
         Thread.sleep(250);
         nettyClient.doLogin().sync();

@@ -5,6 +5,12 @@ mim:
   client:
     test:
       username: shuangshu
-      password: 1234
+      password: 12345
       host: localhost
       port: 8080
+      name: mim-client-test
+
+# 日志设置
+logging:
+  level:
+    com.mdc.mim: info
