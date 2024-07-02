@@ -1,8 +1,8 @@
-CREATE TABLE user_status (
-    -- 注意，创建/删除User时也需要同步创建/删除相同Uid的UserStatus
-    uid BIGINT PRIMARY KEY,
-    status INT NOT NULL, -- 在线(2)、隐身(1)和离线(0)等
-    lastOnlineTime DATE NOT NULL, -- 最后一次在线时间，当用户由在线变为离线/隐身时更新；如果用户当前状态为在线，则该字段无意义
-    doNotify BOOLEAN NOT NULL DEFAULT TRUE
+CREATE TABLE `user_status` (
+    `uid` BIGINT PRIMARY KEY,
+    `status` TINYINT NOT NULL,
+    -- 0: 未知，1；在线，2：离线， 3：隐身
+    `notify_status` TINYINT NOT NULL DEFAULT 0,
+    -- 通知状态，0：不通知，1：通知
 ) ENGINE = InnoDB,
-CHARSET = utf8;
+CHARSET = utf8mb4;

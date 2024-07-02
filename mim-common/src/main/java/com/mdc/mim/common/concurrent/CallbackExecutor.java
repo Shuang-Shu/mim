@@ -25,7 +25,6 @@ public class CallbackExecutor {
         return executor;
     }
 
-    @SuppressWarnings("unchecked")
     public <R> void execute(CallbackTask<R> task) {
         ListenableFuture<R> f = (ListenableFuture<R>) executorService.submit(task);
         Futures.addCallback(f, new FutureCallback<R>() {

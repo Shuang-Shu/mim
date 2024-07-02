@@ -1,7 +1,7 @@
-CREATE TABLE friend (
-    uid BIGINT,
-    friendUid BIGINT,
-    createTime DATE NOT NULL,
+CREATE TABLE `friend` (
+    `uid` BIGINT,
+    `friend_uid` BIGINT,
+    `create_time` DATE NOT NULL,
     PRIMARY KEY uf_index (uid, friendUid)
 ) ENGINE = InnoDB,
-CHARSET = utf8;
+CHARSET = utf8mb4;

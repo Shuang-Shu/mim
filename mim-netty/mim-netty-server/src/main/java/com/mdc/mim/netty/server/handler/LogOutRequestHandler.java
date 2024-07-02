@@ -18,8 +18,8 @@ import org.springframework.stereotype.Component;
  * @author ShuangShu
  * @version 1.0
  * @description: 用于处理登出请求的Handler，该Handler包括2个功能：
- * 1. 处理合法的登出请求
- * 2. 请求发起时检查连接的状态，如果已经超时则自动执行登出操作
+ *               1. 处理合法的登出请求
+ *               2. 请求发起时检查连接的状态，如果已经超时则自动执行登出操作
  * @date 2023/11/24 0:52
  */
 @Slf4j
@@ -44,7 +44,8 @@ public class LogOutRequestHandler extends ChannelInboundHandlerAdapter {
         var serverSession = sessionManager.getSession(message.getSessionId());
         if (serverSession == null) {
             // session不存在，直接恢复未登录状态
-            ctx.channel().pipeline().addBefore(LogOutRequestHandler.NAME, LogInRequestHandler.NAME, logInRequestHandler);
+            ctx.channel().pipeline().addBefore(LogOutRequestHandler.NAME, LogInRequestHandler.NAME,
+                    logInRequestHandler);
             ctx.channel().pipeline().remove(LogOutRequestHandler.NAME);
             serverSession.logOutSuccess(message);
             // 将自身从sessionManager中移除
@@ -83,7 +84,6 @@ public class LogOutRequestHandler extends ChannelInboundHandlerAdapter {
                     public Boolean call() throws Exception {
                         return logOutProcessor.process(session, (Message) msg);
                     }
-                }
-        );
+                });
     }
 }

@@ -1,4 +1,4 @@
-INSERT INTO friend
+INSERT INTO friend (uid, friend_uid, create_time)
 VALUES (1, 2, '2018-01-01'),
     (1, 3, '2018-01-01'),
     (1, 4, '2018-01-01'),

@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class MockMvcTestUtils {
     public static R mockPerformPost(MockMvc mvc, MockHttpSession session, String url,
-                                    Map<String, String> params) throws Exception {
+            Map<String, String> params) throws Exception {
         var req = MockMvcRequestBuilders.post(url).session(session);
         for (var key : params.keySet()) {
             req.param(key, String.valueOf(params.get(key)));
