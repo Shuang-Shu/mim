@@ -2,3 +2,5 @@
 .idea
 **/target
 .VSCodeCounter
+**/gen
+mim-wsl-docker-mysql.session.sql

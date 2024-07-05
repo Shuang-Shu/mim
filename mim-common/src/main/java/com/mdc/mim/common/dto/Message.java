@@ -1,7 +1,7 @@
 package com.mdc.mim.common.dto;
 
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
-import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
+import com.mdc.mim.common.enumeration.ResponseCodeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -47,7 +47,7 @@ public class Message {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LogInResponse {
-        ResponsesCodeEnum code;
+        ResponseCodeEnum code;
         UserDTO user;
         String info;
         String sessionId;
@@ -69,7 +69,7 @@ public class Message {
     @AllArgsConstructor
     public static class LogOutResponse {
         String info;
-        ResponsesCodeEnum code;
+        ResponseCodeEnum code;
     }
 
     // 发送方-->服务器的聊天消息请求

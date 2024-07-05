@@ -1,7 +1,7 @@
 package com.mdc.mim.netty.server.processor;
 
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
-import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
+import com.mdc.mim.common.enumeration.ResponseCodeEnum;
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.netty.server.handler.LogInRequestHandler;
 import com.mdc.mim.netty.server.handler.LogOutRequestHandler;
@@ -37,7 +37,7 @@ public class LogOutProcessor implements AbstractProcessor {
         var logoutResp = Message.LogOutResponse.builder().build();
         var respMessage = Message.builder().id(message.getId()).messageType(MessageTypeEnum.LOGOUT_RESP).logOutResponse(logoutResp).build();
         sessionManager.removeSession(message.getSessionId());
-        logoutResp.setCode(ResponsesCodeEnum.SUCCESS);
+        logoutResp.setCode(ResponseCodeEnum.SUCCESS);
         // 发送消息
         try {
             serverSession.writeAndFlush(respMessage).sync();

@@ -1,9 +1,9 @@
 package com.mdc.mim.common.enumeration;
 
-public enum ResponsesCodeEnum {
+public enum ResponseCodeEnum {
     SUCCESS(200), FAILED(500);
 
-    ResponsesCodeEnum(int code) {
+    ResponseCodeEnum(int code) {
         this.code = code;
     }
 

@@ -50,7 +50,8 @@ public class ServerSession extends AbstractSession implements IServerSessionStat
         while ((nextMessage = messageBuffer.next()) != null) {
             nextNextId++;
             if (nextMessage.getMessageType().equals(MessageTypeEnum.MESSAGE_REQ)) {
-                nextMessage.getMessageRequest().getChatMessage().setId(chatMessageSeqNoManager.getSeqNo(getUser().getUid()));
+                nextMessage.getMessageRequest().getChatMessage()
+                        .setId(chatMessageSeqNoManager.getSeqNo(getUser().getUid()));
                 continuousMessages.add(nextMessage);
             }
         }

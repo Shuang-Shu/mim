@@ -20,7 +20,7 @@ public class UserController {
         if (passwdMd5 == null) {
             return R.error("passwdMd5 is null");
         }
-        var user = userService.findByName(userName);
+        UserEntity user = userService.findByName(userName);
 
         if (user == null || !passwdMd5.equals(user.getPasswdMd5())) {
             return R.ok().put("valid", false);

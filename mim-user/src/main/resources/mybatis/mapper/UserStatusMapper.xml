@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdc.mim.user.dao.UserStatusMapper">
+    <insert id="insertUserStatuses"> INSERT INTO user_status (uid, status, lastOnlineTime, doNotify)
+        VALUES <foreach collection='list' item='item' index='index' separator=','> (#{item.uid},
+        #{item.status}, #{item.lastOnlineTime}, #{item.doNotify}) </foreach>
+    </insert>
+
+    <select id="findByUids" resultType="UserStatus"> SELECT * FROM user_status WHERE uid IN <foreach
+            collection='list' item='item' open='(' separator=',' close=')'> #{item} </foreach>
+    </select>
+
+    <delete id="deleteByUids"> DELETE FROM user_status WHERE uid IN <foreach collection='list'
+            item='item' open='(' separator=',' close=')'> #{item} </foreach>
+    </delete>
+
+    <update id="updateUserStatuses">
+        <foreach collection='list' item='item' index='index' open='' separator=';' close=''> UPDATE
+        user_status SET status = #{item.status}, lastOnlineTime = #{item.lastOnlineTime}, doNotify =
+        #{item.doNotify} WHERE uid = #{item.uid} </foreach>
+    </update>
+
+    <insert id="insertUserStatus" parameterType="UserStatus"> INSERT INTO user_status (uid, status,
+        lastOnlineTime<if test="doNotify != null">, doNotify</if>) VALUES (#{uid}, #{status},
+        #{lastOnlineTime}<if test="doNotify != null">, #{doNotify}</if>) <!--        INSERT INTO
+        user_status (uid, status, lastOnlineTime<if test="doNotify != null">,
+        doNotify</if>) VALUES-->
+        <!--        (#{uid}, #{status}, #{lastOnlineTime},-->
+        <!--        <if test="doNotify != null">, #{doNotify}</if>-->
+    </insert>
+</mapper>

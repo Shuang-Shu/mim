@@ -126,8 +126,7 @@ public class NettyServer implements InitializingBean {
                     () -> {
                         init();
                         start();
-                    }
-            );
+                    });
             serverThread.start();
         } else {
             log.info("test mode, should start server manually");

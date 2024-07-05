@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mdc.mim.user.dao.UserMapper">
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="uid"
+        parameterType="User"> INSERT INTO user (`uid`, `passwd_md5`, `username`, `register_date`)
+        VALUES (#{uid}, #{passwdMd5}, #{userName}, #{registerDate}) </insert>
+
+    <insert id="insertUsers" useGeneratedKeys="true" keyProperty="id" parameterType="User">INSERT
+        INTO user (`uid`, `passwd_md5`, `username`, `register_date`) VALUES <foreach
+            collection='list' item='user' separator=','> (#{user.uid}, #{user.passwdMd5},
+        #{user.userName}, #{user.registerDate}) </foreach>
+    </insert>
+
+    <select id="findByUids" resultType="User"> SELECT * FROM user WHERE uid IN <foreach
+            collection="list" item="id" open="(" close=")" separator=","> #{id} </foreach>
+    </select>
+
+    <select id="findByNames" resultType="User"> SELECT * FROM user WHERE username IN <foreach
+            collection="list" item="name" open="(" close=")" separator=","> #{name} </foreach>
+    </select>
+
+    <delete id="deleteByIds">DELETE FROM user WHERE uid IN <foreach collection="list" item="id"
+            open="(" close=")" separator=","> #{id} </foreach>
+    </delete>
+
+    <update id="updateUsers">
+        <foreach collection='list' item='user' index='index' separator=';' close=''> UPDATE user SET
+        username = #{user.userName}, passwd_md5 = #{user.passwdMd5}, nickname = #{user.nickName},
+        register_date = #{user.registerDate} WHERE uid = #{user.uid} </foreach>
+    </update>
+</mapper>

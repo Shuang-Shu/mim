@@ -2,7 +2,7 @@ package com.mdc.mim.netty.client.handler;
 
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
-import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
+import com.mdc.mim.common.enumeration.ResponseCodeEnum;
 import com.mdc.mim.netty.client.NettyClient;
 import com.mdc.mim.netty.client.session.ClientSession;
 import io.netty.channel.ChannelHandler;
@@ -28,7 +28,7 @@ public class LogInOutResponesHandler extends ChannelInboundHandlerAdapter {
             log.info("{} receive login response", nettyClient.getClientName());
             var loginResp = message.getLogInResponse();
             clientSession.setSessionId(message.getLogInResponse().getSessionId());
-            if (loginResp.getCode().equals(ResponsesCodeEnum.SUCCESS)) {
+            if (loginResp.getCode().equals(ResponseCodeEnum.SUCCESS)) {
                 // 设置会话的sessionId
                 clientSession.getState().logInSuccess(message);
                 clientSession.setUser(loginResp.getUser());
@@ -42,7 +42,7 @@ public class LogInOutResponesHandler extends ChannelInboundHandlerAdapter {
         } else if (message.getMessageType().equals(MessageTypeEnum.LOGOUT_RESP)) {
             log.debug("client receive logout response: {}", msg);
             var logoutResp = message.getLogOutResponse();
-            if (logoutResp.getCode().equals(ResponsesCodeEnum.SUCCESS)) {
+            if (logoutResp.getCode().equals(ResponseCodeEnum.SUCCESS)) {
                 // Client状态转换为未登录
                 clientSession.getState().logOutSuccess(message);
                 clientSession.setUser(null);

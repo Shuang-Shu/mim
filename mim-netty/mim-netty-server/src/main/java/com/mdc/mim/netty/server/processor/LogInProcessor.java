@@ -2,7 +2,7 @@ package com.mdc.mim.netty.server.processor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
-import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
+import com.mdc.mim.common.enumeration.ResponseCodeEnum;
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.netty.feign.UserFeignService;
@@ -38,7 +38,8 @@ public class LogInProcessor implements AbstractProcessor {
         var loginReq = message.getLogInRequest();
         var loginResp = Message.LogInResponse.builder()
                 .info("successfully identified").sessionId(serverSession.getSessionId()).build();
-        var respMessage = Message.builder().id(message.getId()).messageType(MessageTypeEnum.LOGIN_RESP).logInResponse(loginResp).build();
+        var respMessage = Message.builder().id(message.getId()).messageType(MessageTypeEnum.LOGIN_RESP)
+                .logInResponse(loginResp).build();
         boolean result = false;
         // 检查是否已经登录
         if (serverSession.getState().stateDescription().equals(StateConstant.NOT_LOGIN)) {
@@ -46,10 +47,10 @@ public class LogInProcessor implements AbstractProcessor {
             var r = userFeignService.identify(user.getUserName(), user.getPasswdMd5());
             var ok = (Boolean) r.get("valid");
             if (!ok) {
-                loginResp.setCode(ResponsesCodeEnum.FAILED);
+                loginResp.setCode(ResponseCodeEnum.FAILED);
                 loginResp.setInfo("identify failed, wrong username or password");
             } else {
-                loginResp.setCode(ResponsesCodeEnum.SUCCESS);
+                loginResp.setCode(ResponseCodeEnum.SUCCESS);
                 var objectMapper = new ObjectMapper();
                 var userDto = objectMapper.convertValue(r.get("user"), UserDTO.class);
                 loginResp.setUser(userDto);
@@ -61,7 +62,7 @@ public class LogInProcessor implements AbstractProcessor {
         } else if (serverSession.getState().stateDescription().equals(StateConstant.LOGIN)) {
             // 已登录
             serverSession.logOutSuccess(message);
-            loginResp.setCode(ResponsesCodeEnum.SUCCESS);
+            loginResp.setCode(ResponseCodeEnum.SUCCESS);
             result = true;
         }
         if (result) {

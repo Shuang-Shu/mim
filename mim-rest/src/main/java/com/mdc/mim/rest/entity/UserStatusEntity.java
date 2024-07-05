@@ -20,7 +20,8 @@ import java.sql.Date;
 @AllArgsConstructor
 public class UserStatusEntity implements Serializable {
     public static UserStatusEntity buildWith(UserEntity user) {
-        return UserStatusEntity.builder().uid(user.getUid()).status(0).lastOnlineTime(new Date(System.currentTimeMillis())).doNotify(true).build();
+        return UserStatusEntity.builder().uid(user.getUid()).status(0)
+                .lastOnlineTime(new Date(System.currentTimeMillis())).doNotify(true).build();
     }
 
     private Long uid;

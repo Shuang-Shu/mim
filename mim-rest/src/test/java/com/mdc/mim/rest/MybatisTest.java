@@ -35,7 +35,8 @@ public class MybatisTest {
     @Autowired
     private MaxSeqMapper maxSeqMapper;
 
-    ChatMessageEntity testChatMessageEntity = ChatMessageEntity.builder().id(1L).fromUid(1L).toUid(2L).type(ChatMessageTypeConst.TEXT).content("hello").createTime(new Date(System.currentTimeMillis())).build();
+    ChatMessageEntity testChatMessageEntity = ChatMessageEntity.builder().id(1L).fromUid(1L).toUid(2L)
+            .type(ChatMessageTypeConst.TEXT).content("hello").createTime(new Date(System.currentTimeMillis())).build();
 
     @Test
     public void basicTest() {
@@ -88,7 +89,8 @@ public class MybatisTest {
     // userStatus相关测试
     @Test
     public void testUserStatusMapper() {
-        var userStatus = UserStatusEntity.builder().status(UserStatusConst.ONLINE).uid(1L).lastOnlineTime(new Date(System.currentTimeMillis())).build();
+        var userStatus = UserStatusEntity.builder().status(UserStatusConst.ONLINE).uid(1L)
+                .lastOnlineTime(new Date(System.currentTimeMillis())).build();
         var ret = userStatusMapper.insertUserStatus(userStatus);
         Assertions.assertEquals(1, ret);
         userStatus = userStatusMapper.findByUid(1L);
@@ -160,7 +162,8 @@ public class MybatisTest {
 
     @Test
     public void testSaveChatMessages() {
-        var chatMessage = ChatMessageEntity.builder().id(1L).fromUid(1L).toUid(2L).type(ChatMessageTypeConst.TEXT).content("hello").createTime(new Date(System.currentTimeMillis())).build();
+        var chatMessage = ChatMessageEntity.builder().id(1L).fromUid(1L).toUid(2L).type(ChatMessageTypeConst.TEXT)
+                .content("hello").createTime(new Date(System.currentTimeMillis())).build();
         var messages = List.of(chatMessage);
         chatMessageMapper.insertChatMessages(messages);
     }

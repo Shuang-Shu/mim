@@ -7,7 +7,7 @@ import com.mdc.mim.common.dto.Message.*;
 import com.mdc.mim.common.dto.UserDTO;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
 import com.mdc.mim.common.enumeration.PlatformEnum;
-import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
+import com.mdc.mim.common.enumeration.ResponseCodeEnum;
 import com.mdc.mim.common.utils.ClassIdUtils;
 
 import java.util.function.Supplier;
@@ -19,10 +19,10 @@ public class CommonConst {
     public static final int CONTENT_LENGTH = 4;
 
     private static final Class<?>[] messageClasses = {
-            String.class, Message.class, ChatMessageTypeConst.class, MessageTypeEnum.class, ResponsesCodeEnum.class, UserDTO.class,
+            String.class, Message.class, ChatMessageTypeConst.class, MessageTypeEnum.class, ResponseCodeEnum.class, UserDTO.class,
             Message.LogInRequest.class, LogInResponse.class, LogOutRequest.class,
             LogOutResponse.class, MessageRequest.class, MessageResponse.class, MessageNotify.class, PlatformEnum.class,
-            ResponsesCodeEnum.class, ChatMessageDTO.class
+            ResponseCodeEnum.class, ChatMessageDTO.class
     };
 
     public static final Supplier<Kryo> supplier = () -> {

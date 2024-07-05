@@ -4,7 +4,7 @@ import com.mdc.mim.common.constant.ChatMessageTypeConst;
 import com.mdc.mim.common.dto.ChatMessageDTO;
 import com.mdc.mim.common.dto.Message;
 import com.mdc.mim.common.enumeration.MessageTypeEnum;
-import com.mdc.mim.common.enumeration.ResponsesCodeEnum;
+import com.mdc.mim.common.enumeration.ResponseCodeEnum;
 import com.mdc.mim.common.dto.UserDTO;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -92,7 +92,7 @@ public class EndecoderTest {
 //        initialChannelWith(channelHandlers);
         var loginRequest = Message.LogInRequest.builder().user(userDTO).appVersion(CommonConst.APP_VERSION).build();
         doTestPipeline(channel, loginRequest);
-        var resp = Message.builder().id(123L).messageType(MessageTypeEnum.LOGIN_RESP).logInResponse(LogInResponse.builder().code(ResponsesCodeEnum.SUCCESS).info("success").build());
+        var resp = Message.builder().id(123L).messageType(MessageTypeEnum.LOGIN_RESP).logInResponse(LogInResponse.builder().code(ResponseCodeEnum.SUCCESS).info("success").build());
         doTestPipeline(channel, resp);
     }
 

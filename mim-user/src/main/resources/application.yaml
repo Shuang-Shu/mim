@@ -1,0 +1,31 @@
+spring:
+  cache:
+    type: redis
+  redis:
+    host: localhost
+    port: 6379
+  application:
+    name: mim-user
+  datasource:
+    username: root
+    password: 1234
+    url: jdbc:mysql://localhost:3306/mim?useUnicode=true&characterEncoding=utf8&autoReconnect=true&useSSL=false&serverTimezone=GMT%2B8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+server:
+  port: 12000
+
+# mybatis配置
+mybatis:
+  check-config-location: true
+  #  mybatis框架配置文件，对mybatis的生命周期起作用
+  config-location: "classpath:mybatis/mybatis-config.xml"
+  #  配置xml路径
+  mapper-locations: "classpath:mybatis/mapper/*Mapper.xml"
+  #  配置model包路径
+  type-aliases-package: "com.mdc.mim.user.domain.*"
+
+# log配置
+logging:
+  level:
+    com.lucifer.springboot.cache.mapper: debug

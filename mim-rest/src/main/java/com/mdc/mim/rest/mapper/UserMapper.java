@@ -40,9 +40,7 @@ public interface UserMapper {
     public int deleteByNames(List<String> userNames);
 
     // 更新使用update+实体类名(s)
-    @Update(
-            "update user set userName = #{userName}, passwdMd5 = #{passwdMd5}, nickName = #{nickName}, registerDate = #{registerDate} where uid = #{uid}"
-    )
+    @Update("update user set userName = #{userName}, passwdMd5 = #{passwdMd5}, nickName = #{nickName}, registerDate = #{registerDate} where uid = #{uid}")
     public int updateUser(UserEntity user);
 
     public int updateUsers(List<UserEntity> users);

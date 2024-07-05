@@ -82,8 +82,7 @@ public class LogInRequestHandler extends ChannelInboundHandlerAdapter {
                     public Boolean call() throws Exception {
                         return loginProcessor.process(session, (Message) msg);
                     }
-                }
-        );
+                });
     }
 
     /**
