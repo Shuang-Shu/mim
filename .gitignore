@@ -3,4 +3,6 @@
 **/target
 .VSCodeCounter
 **/gen
+
+# special cases
 mim-wsl-docker-mysql.session.sql

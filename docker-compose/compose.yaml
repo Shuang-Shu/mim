@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # 服务发现服务
+  mim-sd:
+    image: mim-sd:latest
+    container_name: mim-sd
+    ports:
+      - "2379:2379" # etcd 默认端口
+    environment:
+      - ETCD_NAME=service-discovery
+      - ETCD_DATA_DIR=/var/lib/etcd
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://0.0.0.0:2380
+      - ETCD_ADVERTISE_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+    volumes:
+      - ./data/etcd:/var/lib/etcd
+
+  # Envoy 服务
+  envoy:
+    image: envoyproxy/envoy:distroless-dev
+    container_name: envoy
+    ports:
+      - "10000:10000"
+    volumes:
+      - ./conf/envoy.yaml:/etc/envoy/envoy.yaml
+    depends_on:
+      - service-discovery
+      - mim-user
+
+  # Thrift 服务
+  mim-user:
+    image: mim-user:latest
+    container_name: mim-user
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "28080:28080" # Thrift 服务的端口
+    environment:
+      - VERSION=${VERSION} # 版本号
+    depends_on:
+      - service-discovery
